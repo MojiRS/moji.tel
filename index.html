@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Moji - Contact Directory">
+    <meta name="color-scheme" content="light dark">
     <title>Moji | moji.tel</title>
     <style>
         * {
@@ -12,51 +13,82 @@
             box-sizing: border-box;
         }
 
+        :root {
+            /* Dark theme (default) */
+            --bg-color: #1a1a1f;
+            --card-bg: #28282e;
+            --card-border: #3a3a42;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888;
+            --text-muted: #666;
+            --link-bg: linear-gradient(135deg, #32323a 0%, #2d2d35 100%);
+            --link-border: #3e3e48;
+            --link-text: #e0e0e0;
+            --link-icon: #9b8a9b;
+            --link-arrow: #555;
+            --contact-icon: #8b5c8b;
+            --contact-text: #d0d0d0;
+            --avatar-border: #4a3a4a;
+            --avatar-shadow: rgba(74, 58, 74, 0.4);
+            --avatar-shadow-outer: rgba(74, 58, 74, 0.15);
+            --highlight-color: #8a7cb8;
+            --highlight-border: #6b5b95;
+            --highlight-shadow: rgba(107, 91, 149, 0.2);
+            --card-shadow: rgba(0, 0, 0, 0.5);
+            --card-glow: rgba(139, 92, 139, 0.1);
+            --card-glow-active: rgba(139, 92, 139, 0.2);
+            --card-glow-outer: rgba(139, 92, 139, 0.05);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #f0f0f3;
+                --card-bg: #ffffff;
+                --card-border: #e0e0e5;
+                --text-primary: #1a1a1f;
+                --text-secondary: #666;
+                --text-muted: #888;
+                --link-bg: linear-gradient(135deg, #f8f8fa 0%, #f0f0f3 100%);
+                --link-border: #e0e0e5;
+                --link-text: #2a2a30;
+                --link-icon: #7a6a7a;
+                --link-arrow: #aaa;
+                --contact-icon: #8b5c8b;
+                --contact-text: #3a3a40;
+                --avatar-border: #6a5a6a;
+                --avatar-shadow: rgba(106, 90, 106, 0.3);
+                --avatar-shadow-outer: rgba(106, 90, 106, 0.1);
+                --highlight-color: #7a6cb0;
+                --highlight-border: #6b5b95;
+                --highlight-shadow: rgba(107, 91, 149, 0.15);
+                --card-shadow: rgba(0, 0, 0, 0.1);
+                --card-glow: rgba(139, 92, 139, 0.08);
+                --card-glow-active: rgba(139, 92, 139, 0.15);
+                --card-glow-outer: rgba(139, 92, 139, 0.03);
+            }
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: #1a1a1f;
+            background-color: var(--bg-color);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            position: relative;
-        }
-
-        /* Geometric background pattern */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                linear-gradient(30deg, #252529 12%, transparent 12.5%, transparent 87%, #252529 87.5%, #252529),
-                linear-gradient(150deg, #252529 12%, transparent 12.5%, transparent 87%, #252529 87.5%, #252529),
-                linear-gradient(30deg, #252529 12%, transparent 12.5%, transparent 87%, #252529 87.5%, #252529),
-                linear-gradient(150deg, #252529 12%, transparent 12.5%, transparent 87%, #252529 87.5%, #252529),
-                linear-gradient(60deg, #2a2a30 25%, transparent 25.5%, transparent 75%, #2a2a30 75%, #2a2a30),
-                linear-gradient(60deg, #2a2a30 25%, transparent 25.5%, transparent 75%, #2a2a30 75%, #2a2a30);
-            background-size: 80px 140px;
-            background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
-            opacity: 0.5;
-            z-index: 0;
+            padding: 30px;
         }
 
         .card {
-            background: #28282e;
+            background: var(--card-bg);
             border-radius: 16px;
             padding: 40px 30px;
             max-width: 400px;
             width: 100%;
             box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(139, 92, 139, 0.1),
+                0 20px 60px var(--card-shadow),
+                0 0 0 1px var(--card-glow),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            position: relative;
-            z-index: 1;
-            border: 1px solid #3a3a42;
+            border: 1px solid var(--card-border);
         }
 
         .header {
@@ -70,10 +102,10 @@
             border-radius: 50%;
             margin: 0 auto 16px;
             overflow: hidden;
-            border: 3px solid #8b5c8b;
+            border: 3px solid var(--avatar-border);
             box-shadow:
-                0 0 20px rgba(139, 92, 139, 0.3),
-                0 0 40px rgba(139, 92, 139, 0.1);
+                0 0 20px var(--avatar-shadow),
+                0 0 40px var(--avatar-shadow-outer);
         }
 
         .avatar img {
@@ -85,13 +117,13 @@
         .name {
             font-size: 28px;
             font-weight: 700;
-            color: #f0f0f0;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
 
         .domain {
             font-size: 14px;
-            color: #888;
+            color: var(--text-secondary);
             font-family: monospace;
         }
 
@@ -99,12 +131,16 @@
             margin-bottom: 24px;
         }
 
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
         .section-title {
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            color: #666;
+            color: var(--text-muted);
             margin-bottom: 12px;
             padding-left: 4px;
         }
@@ -115,42 +151,42 @@
             gap: 10px;
         }
 
-        .link {
+        .link, .contact-link {
             display: flex;
             align-items: center;
             padding: 14px 18px;
-            background: linear-gradient(135deg, #32323a 0%, #2d2d35 100%);
+            background: var(--link-bg);
             border-radius: 10px;
             text-decoration: none;
-            color: #e0e0e0;
+            color: var(--link-text);
             font-weight: 500;
             transition: all 0.25s ease;
-            border: 1px solid #3e3e48;
+            border: 1px solid var(--link-border);
             position: relative;
             overflow: hidden;
         }
 
-        .link::before {
+        .link::before, .contact-link::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(139, 92, 139, 0.15) 0%, rgba(155, 90, 90, 0.15) 100%);
+            background: linear-gradient(90deg, transparent 0%, rgba(107, 91, 149, 0.18) 100%);
             opacity: 0;
             transition: opacity 0.25s ease;
         }
 
-        .link:hover {
-            border-color: #8b5c8b;
+        .link:hover, .contact-link:hover {
+            border-color: var(--highlight-border);
             transform: translateY(-2px);
             box-shadow:
                 0 8px 24px rgba(0, 0, 0, 0.3),
-                0 0 20px rgba(139, 92, 139, 0.2);
+                0 0 20px var(--highlight-shadow);
         }
 
-        .link:hover::before {
+        .link:hover::before, .contact-link:hover::before {
             opacity: 1;
         }
 
@@ -161,7 +197,7 @@
             flex-shrink: 0;
             position: relative;
             z-index: 1;
-            color: #9b8a9b;
+            color: var(--link-icon);
         }
 
         .link-text {
@@ -171,29 +207,15 @@
         }
 
         .link-arrow {
-            color: #555;
+            color: var(--link-arrow);
             font-size: 18px;
             position: relative;
             z-index: 1;
             transition: color 0.25s ease;
         }
 
-        .link:hover .link-arrow {
-            color: #9b5a5a;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 18px;
-            background: linear-gradient(135deg, #32323a 0%, #2d2d35 100%);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #3e3e48;
-        }
-
-        .contact-item:last-child {
-            margin-bottom: 0;
+        .link:hover .link-arrow, .contact-link:hover .link-arrow {
+            color: var(--highlight-color);
         }
 
         .contact-icon {
@@ -201,58 +223,33 @@
             height: 20px;
             margin-right: 14px;
             flex-shrink: 0;
-            color: #8b5c8b;
+            color: var(--contact-icon);
+            position: relative;
+            z-index: 1;
         }
 
         .contact-text {
-            color: #d0d0d0;
+            color: var(--contact-text);
             font-size: 15px;
-        }
-
-        .contact-text a {
-            color: #d0d0d0;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .contact-text a:hover {
-            color: #9b5a5a;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid #3a3a42;
-        }
-
-        .tel-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #555;
-        }
-
-        .tel-badge svg {
-            width: 14px;
-            height: 14px;
+            flex-grow: 1;
+            position: relative;
+            z-index: 1;
         }
 
         /* Subtle animated glow on card */
         @keyframes subtleGlow {
             0%, 100% {
                 box-shadow:
-                    0 20px 60px rgba(0, 0, 0, 0.5),
-                    0 0 0 1px rgba(139, 92, 139, 0.1),
+                    0 20px 60px var(--card-shadow),
+                    0 0 0 1px var(--card-glow),
                     inset 0 1px 0 rgba(255, 255, 255, 0.05);
             }
             50% {
                 box-shadow:
-                    0 20px 60px rgba(0, 0, 0, 0.5),
-                    0 0 0 1px rgba(139, 92, 139, 0.2),
+                    0 20px 60px var(--card-shadow),
+                    0 0 0 1px var(--card-glow-active),
                     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                    0 0 30px rgba(139, 92, 139, 0.05);
+                    0 0 30px var(--card-glow-outer);
             }
         }
 
@@ -293,25 +290,16 @@
 
         <div class="section">
             <div class="section-title">Contact</div>
-            <div class="contact-item">
+            <a href="mailto:me@moji.tel" class="contact-link">
                 <svg class="contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                     <polyline points="22,6 12,13 2,6"/>
                 </svg>
-                <span class="contact-text">
-                    <a href="mailto:me@moji.tel">me@moji.tel</a>
-                </span>
-            </div>
+                <span class="contact-text">me@moji.tel</span>
+                <span class="link-arrow">&rarr;</span>
+            </a>
         </div>
 
-        <div class="footer">
-            <span class="tel-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
-                </svg>
-                .tel directory
-            </span>
-        </div>
     </div>
 </body>
 </html>
