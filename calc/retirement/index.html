@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Retirement Calculator - Plan your financial future">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/png" href="../../chibi_hornet_transparent_cropped.png">
+    <title>Moji | Retirement Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #1a1a1f;
+            --card-bg: #28282e;
+            --card-border: #3a3a42;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888;
+            --text-muted: #666;
+            --input-bg: #32323a;
+            --input-border: #3e3e48;
+            --input-focus: #6b5b95;
+            --highlight-color: #8a7cb8;
+            --highlight-border: #6b5b95;
+            --highlight-shadow: rgba(107, 91, 149, 0.2);
+            --card-shadow: rgba(0, 0, 0, 0.5);
+            --card-glow: rgba(139, 92, 139, 0.1);
+            --card-glow-active: rgba(139, 92, 139, 0.2);
+            --card-glow-outer: rgba(139, 92, 139, 0.05);
+            --success-color: #4ade80;
+            --warning-color: #fbbf24;
+            --error-color: #f87171;
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #f0f0f3;
+                --card-bg: #ffffff;
+                --card-border: #e0e0e5;
+                --text-primary: #1a1a1f;
+                --text-secondary: #666;
+                --text-muted: #888;
+                --input-bg: #f8f8fa;
+                --input-border: #e0e0e5;
+                --input-focus: #6b5b95;
+                --highlight-color: #7a6cb0;
+                --highlight-border: #6b5b95;
+                --highlight-shadow: rgba(107, 91, 149, 0.15);
+                --card-shadow: rgba(0, 0, 0, 0.1);
+                --card-glow: rgba(139, 92, 139, 0.08);
+                --card-glow-active: rgba(139, 92, 139, 0.15);
+                --card-glow-outer: rgba(139, 92, 139, 0.03);
+                --success-color: #22c55e;
+                --warning-color: #f59e0b;
+                --error-color: #ef4444;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px 30px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow:
+                0 20px 60px var(--card-shadow),
+                0 0 0 1px var(--card-glow),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            animation: subtleGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes subtleGlow {
+            0%, 100% {
+                box-shadow:
+                    0 20px 60px var(--card-shadow),
+                    0 0 0 1px var(--card-glow),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            }
+            50% {
+                box-shadow:
+                    0 20px 60px var(--card-shadow),
+                    0 0 0 1px var(--card-glow-active),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+                    0 0 30px var(--card-glow-outer);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: color 0.25s ease;
+        }
+
+        .back-link:hover {
+            color: var(--highlight-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.25s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px var(--highlight-shadow);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--highlight-color) 0%, var(--highlight-border) 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-top: 10px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--highlight-shadow);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--card-border);
+            display: none;
+        }
+
+        .results.visible {
+            display: block;
+        }
+
+        .results-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .result-value {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .result-value.success {
+            color: var(--success-color);
+        }
+
+        .result-value.warning {
+            color: var(--warning-color);
+        }
+
+        .result-value.error {
+            color: var(--error-color);
+        }
+
+        .result-summary {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .summary-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .summary-highlight {
+            color: var(--highlight-color);
+            font-weight: 600;
+        }
+
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <a href="../" class="back-link">
+            <span>&larr;</span>
+            <span>Back to Calculators</span>
+        </a>
+
+        <div class="header">
+            <h1 class="title">Retirement Calculator</h1>
+            <p class="subtitle">Plan your financial future</p>
+        </div>
+
+        <form id="retirementForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="currentAge">Current Age</label>
+                    <input type="number" id="currentAge" class="form-input" placeholder="30" min="18" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="retirementAge">Retirement Age</label>
+                    <input type="number" id="retirementAge" class="form-input" placeholder="65" min="18" max="100" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="currentSavings">Current Savings ($)</label>
+                <input type="number" id="currentSavings" class="form-input" placeholder="50,000" min="0" step="1000" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="monthlyContribution">Monthly Contribution ($)</label>
+                <input type="number" id="monthlyContribution" class="form-input" placeholder="500" min="0" step="50" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="annualReturn">Expected Return (%)</label>
+                    <input type="number" id="annualReturn" class="form-input" placeholder="7" min="0" max="30" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="inflationRate">Inflation Rate (%)</label>
+                    <input type="number" id="inflationRate" class="form-input" placeholder="3" min="0" max="20" step="0.1" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="desiredIncome">Desired Annual Income ($)</label>
+                <input type="number" id="desiredIncome" class="form-input" placeholder="60,000" min="0" step="1000" required>
+            </div>
+
+            <button type="submit" class="calculate-btn">Calculate</button>
+        </form>
+
+        <div class="results" id="results">
+            <div class="results-title">Your Results</div>
+
+            <div class="result-item">
+                <span class="result-label">Years until retirement</span>
+                <span class="result-value" id="yearsToRetirement">—</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Projected savings at retirement</span>
+                <span class="result-value" id="projectedSavings">—</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Savings needed (4% rule)</span>
+                <span class="result-value" id="savingsNeeded">—</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Monthly income from savings</span>
+                <span class="result-value" id="monthlyIncome">—</span>
+            </div>
+
+            <div class="result-summary" id="resultSummary">
+                <p class="summary-text" id="summaryText"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function calculateRetirement(e) {
+            e.preventDefault();
+
+            const currentAge = parseInt(document.getElementById('currentAge').value);
+            const retirementAge = parseInt(document.getElementById('retirementAge').value);
+            const currentSavings = parseFloat(document.getElementById('currentSavings').value);
+            const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value);
+            const annualReturn = parseFloat(document.getElementById('annualReturn').value) / 100;
+            const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
+            const desiredIncome = parseFloat(document.getElementById('desiredIncome').value);
+
+            // Validate inputs
+            if (retirementAge <= currentAge) {
+                alert('Retirement age must be greater than current age');
+                return;
+            }
+
+            const yearsToRetirement = retirementAge - currentAge;
+            const monthsToRetirement = yearsToRetirement * 12;
+            const monthlyReturn = annualReturn / 12;
+
+            // Calculate future value of current savings
+            const futureValueCurrentSavings = currentSavings * Math.pow(1 + annualReturn, yearsToRetirement);
+
+            // Calculate future value of monthly contributions (future value of annuity)
+            let futureValueContributions = 0;
+            if (monthlyReturn > 0) {
+                futureValueContributions = monthlyContribution *
+                    ((Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn);
+            } else {
+                futureValueContributions = monthlyContribution * monthsToRetirement;
+            }
+
+            const projectedSavings = futureValueCurrentSavings + futureValueContributions;
+
+            // Calculate inflation-adjusted desired income
+            const inflationAdjustedIncome = desiredIncome * Math.pow(1 + inflationRate, yearsToRetirement);
+
+            // Calculate savings needed using 4% rule
+            const savingsNeeded = inflationAdjustedIncome * 25;
+
+            // Calculate monthly income from projected savings (4% rule)
+            const annualIncomeFromSavings = projectedSavings * 0.04;
+            const monthlyIncomeFromSavings = annualIncomeFromSavings / 12;
+
+            // Update DOM
+            document.getElementById('yearsToRetirement').textContent = yearsToRetirement + ' years';
+            document.getElementById('projectedSavings').textContent = formatCurrency(projectedSavings);
+            document.getElementById('savingsNeeded').textContent = formatCurrency(savingsNeeded);
+            document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncomeFromSavings);
+
+            // Determine status and update styling
+            const projectedElement = document.getElementById('projectedSavings');
+            const summaryElement = document.getElementById('summaryText');
+
+            const percentageOfGoal = (projectedSavings / savingsNeeded) * 100;
+
+            projectedElement.classList.remove('success', 'warning', 'error');
+
+            if (projectedSavings >= savingsNeeded) {
+                projectedElement.classList.add('success');
+                summaryElement.innerHTML = `You're on track! Your projected savings will be <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. You could potentially retire even earlier or increase your retirement income.`;
+            } else if (percentageOfGoal >= 75) {
+                projectedElement.classList.add('warning');
+                const shortfall = savingsNeeded - projectedSavings;
+                summaryElement.innerHTML = `You're close! You'll reach <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. Consider increasing your monthly contribution by <span class="summary-highlight">${formatCurrency(shortfall / monthsToRetirement)}</span> to close the gap.`;
+            } else {
+                projectedElement.classList.add('error');
+                const shortfall = savingsNeeded - projectedSavings;
+                summaryElement.innerHTML = `You'll reach <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. To meet your target, consider increasing contributions, adjusting your retirement age, or revising your income expectations.`;
+            }
+
+            // Show results
+            document.getElementById('results').classList.add('visible');
+        }
+
+        document.getElementById('retirementForm').addEventListener('submit', calculateRetirement);
+    </script>
+</body>
+</html>
