@@ -29,10 +29,6 @@
             --highlight-color: #8a7cb8;
             --highlight-border: #6b5b95;
             --highlight-shadow: rgba(107, 91, 149, 0.2);
-            --card-shadow: rgba(0, 0, 0, 0.5);
-            --card-glow: rgba(139, 92, 139, 0.1);
-            --card-glow-active: rgba(139, 92, 139, 0.2);
-            --card-glow-outer: rgba(139, 92, 139, 0.05);
         }
 
         @media (prefers-color-scheme: light) {
@@ -51,10 +47,6 @@
                 --highlight-color: #7a6cb0;
                 --highlight-border: #6b5b95;
                 --highlight-shadow: rgba(107, 91, 149, 0.15);
-                --card-shadow: rgba(0, 0, 0, 0.1);
-                --card-glow: rgba(139, 92, 139, 0.08);
-                --card-glow-active: rgba(139, 92, 139, 0.15);
-                --card-glow-outer: rgba(139, 92, 139, 0.03);
             }
         }
 
@@ -62,65 +54,28 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background-color: var(--bg-color);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
+            color: var(--text-primary);
         }
 
-        .card {
+        .page-header {
+            padding: 24px 40px;
+            border-bottom: 1px solid var(--card-border);
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 40px 30px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow:
-                0 20px 60px var(--card-shadow),
-                0 0 0 1px var(--card-glow),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            animation: subtleGlow 4s ease-in-out infinite;
         }
 
-        @keyframes subtleGlow {
-            0%, 100% {
-                box-shadow:
-                    0 20px 60px var(--card-shadow),
-                    0 0 0 1px var(--card-glow),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            }
-            50% {
-                box-shadow:
-                    0 20px 60px var(--card-shadow),
-                    0 0 0 1px var(--card-glow-active),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                    0 0 30px var(--card-glow-outer);
-            }
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .title {
-            font-size: 28px;
+        .page-title {
+            font-size: 24px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 4px;
         }
 
-        .subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
+        .main-content {
+            padding: 40px;
+            max-width: 800px;
         }
 
         .section {
-            margin-bottom: 24px;
-        }
-
-        .section:last-child {
-            margin-bottom: 0;
+            margin-bottom: 32px;
         }
 
         .section-title {
@@ -129,20 +84,19 @@
             text-transform: uppercase;
             letter-spacing: 1.5px;
             color: var(--text-muted);
-            margin-bottom: 12px;
-            padding-left: 4px;
+            margin-bottom: 16px;
         }
 
         .links {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .link {
             display: flex;
             align-items: center;
-            padding: 14px 18px;
+            padding: 16px 20px;
             background: var(--link-bg);
             border-radius: 10px;
             text-decoration: none;
@@ -152,6 +106,7 @@
             border: 1px solid var(--link-border);
             position: relative;
             overflow: hidden;
+            max-width: 400px;
         }
 
         .link::before {
@@ -206,34 +161,27 @@
             color: var(--highlight-color);
         }
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 20px;
-            transition: color 0.25s ease;
-        }
+        @media (max-width: 600px) {
+            .page-header {
+                padding: 20px 24px;
+            }
 
-        .back-link:hover {
-            color: var(--highlight-color);
+            .main-content {
+                padding: 24px;
+            }
+
+            .link {
+                max-width: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <a href="../" class="back-link">
-            <span>&larr;</span>
-            <span>Back to moji.tel</span>
-        </a>
+    <header class="page-header">
+        <h1 class="page-title">Calculators</h1>
+    </header>
 
-        <div class="header">
-            <h1 class="title">Calculators</h1>
-            <p class="subtitle">Financial planning tools</p>
-        </div>
-
+    <main class="main-content">
         <div class="section">
             <div class="section-title">Available Tools</div>
             <div class="links">
@@ -247,6 +195,6 @@
                 </a>
             </div>
         </div>
-    </div>
+    </main>
 </body>
 </html>

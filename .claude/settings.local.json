@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter --version:*)",
+      "Bash(cmd.exe /c \"flutter --version\")",
+      "Bash(cmd.exe /c \"where flutter 2>nul || echo Flutter not found in PATH\")",
+      "Bash(powershell.exe -Command \"flutter --version\")"
+    ]
+  }
+}

@@ -27,13 +27,12 @@
             --highlight-color: #8a7cb8;
             --highlight-border: #6b5b95;
             --highlight-shadow: rgba(107, 91, 149, 0.2);
-            --card-shadow: rgba(0, 0, 0, 0.5);
-            --card-glow: rgba(139, 92, 139, 0.1);
-            --card-glow-active: rgba(139, 92, 139, 0.2);
-            --card-glow-outer: rgba(139, 92, 139, 0.05);
             --success-color: #4ade80;
             --warning-color: #fbbf24;
             --error-color: #f87171;
+            --graph-line: #8a7cb8;
+            --graph-fill: rgba(138, 124, 184, 0.2);
+            --graph-grid: #3a3a42;
         }
 
         @media (prefers-color-scheme: light) {
@@ -50,13 +49,12 @@
                 --highlight-color: #7a6cb0;
                 --highlight-border: #6b5b95;
                 --highlight-shadow: rgba(107, 91, 149, 0.15);
-                --card-shadow: rgba(0, 0, 0, 0.1);
-                --card-glow: rgba(139, 92, 139, 0.08);
-                --card-glow-active: rgba(139, 92, 139, 0.15);
-                --card-glow-outer: rgba(139, 92, 139, 0.03);
                 --success-color: #22c55e;
                 --warning-color: #f59e0b;
                 --error-color: #ef4444;
+                --graph-line: #7a6cb0;
+                --graph-fill: rgba(122, 108, 176, 0.15);
+                --graph-grid: #e0e0e5;
             }
         }
 
@@ -64,86 +62,70 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background-color: var(--bg-color);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
+            color: var(--text-primary);
         }
 
-        .card {
+        .page-header {
+            padding: 24px 40px;
+            border-bottom: 1px solid var(--card-border);
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 40px 30px;
-            max-width: 480px;
-            width: 100%;
-            box-shadow:
-                0 20px 60px var(--card-shadow),
-                0 0 0 1px var(--card-glow),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            animation: subtleGlow 4s ease-in-out infinite;
-        }
-
-        @keyframes subtleGlow {
-            0%, 100% {
-                box-shadow:
-                    0 20px 60px var(--card-shadow),
-                    0 0 0 1px var(--card-glow),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            }
-            50% {
-                box-shadow:
-                    0 20px 60px var(--card-shadow),
-                    0 0 0 1px var(--card-glow-active),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-                    0 0 30px var(--card-glow-outer);
-            }
-        }
-
-        .back-link {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 16px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 20px;
-            transition: color 0.25s ease;
+            transition: all 0.25s ease;
+            font-size: 18px;
         }
 
-        .back-link:hover {
+        .back-button:hover {
+            border-color: var(--highlight-border);
             color: var(--highlight-color);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .title {
-            font-size: 28px;
+        .page-title {
+            font-size: 24px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 4px;
         }
 
-        .subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
+        .main-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 40px;
+            padding: 40px;
+            min-height: calc(100vh - 85px);
+        }
+
+        .calculator-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .form-label {
-            display: block;
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--text-muted);
-            margin-bottom: 8px;
         }
 
         .form-input {
@@ -164,48 +146,17 @@
             box-shadow: 0 0 0 3px var(--highlight-shadow);
         }
 
-        .form-input::placeholder {
-            color: var(--text-muted);
-        }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
 
-        .calculate-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--highlight-color) 0%, var(--highlight-border) 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            margin-top: 10px;
-        }
-
-        .calculate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px var(--highlight-shadow);
-        }
-
-        .calculate-btn:active {
-            transform: translateY(0);
-        }
-
         .results {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid var(--card-border);
-            display: none;
-        }
-
-        .results.visible {
-            display: block;
+            padding: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
         }
 
         .results-title {
@@ -221,7 +172,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid var(--card-border);
         }
 
@@ -236,7 +187,7 @@
 
         .result-value {
             color: var(--text-primary);
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
         }
 
@@ -253,16 +204,15 @@
         }
 
         .result-summary {
-            margin-top: 20px;
-            padding: 16px;
+            margin-top: 16px;
+            padding: 14px;
             background: var(--input-bg);
-            border-radius: 10px;
-            text-align: center;
+            border-radius: 8px;
         }
 
         .summary-text {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.6;
         }
 
@@ -271,100 +221,180 @@
             font-weight: 600;
         }
 
-        @media (max-width: 500px) {
-            .form-row {
+        .graph-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .graph-container {
+            flex: 1;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .graph-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .graph-tooltip {
+            position: absolute;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .graph-tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip-year {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .tooltip-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--highlight-color);
+        }
+
+        @media (max-width: 1000px) {
+            .main-content {
                 grid-template-columns: 1fr;
+                padding: 24px;
             }
 
-            .card {
-                padding: 30px 20px;
+            .graph-panel {
+                order: -1;
+            }
+
+            .graph-container {
+                min-height: 250px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .page-header {
+                padding: 20px 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <a href="../" class="back-link">
-            <span>&larr;</span>
-            <span>Back to Calculators</span>
-        </a>
+    <header class="page-header">
+        <a href="../" class="back-button" title="Back to Calculators">&larr;</a>
+        <h1 class="page-title">Retirement Calculator</h1>
+    </header>
 
-        <div class="header">
-            <h1 class="title">Retirement Calculator</h1>
-            <p class="subtitle">Plan your financial future</p>
-        </div>
-
-        <form id="retirementForm">
+    <main class="main-content">
+        <div class="calculator-panel">
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label" for="currentAge">Current Age</label>
-                    <input type="number" id="currentAge" class="form-input" placeholder="30" min="18" max="100" required>
+                    <input type="number" id="currentAge" class="form-input" value="30" min="18" max="100">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="retirementAge">Retirement Age</label>
-                    <input type="number" id="retirementAge" class="form-input" placeholder="65" min="18" max="100" required>
+                    <input type="number" id="retirementAge" class="form-input" value="65" min="18" max="100">
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="currentSavings">Current Savings ($)</label>
-                <input type="number" id="currentSavings" class="form-input" placeholder="50,000" min="0" step="1000" required>
+                <input type="number" id="currentSavings" class="form-input" value="50000" min="0" step="1000">
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="monthlyContribution">Monthly Contribution ($)</label>
-                <input type="number" id="monthlyContribution" class="form-input" placeholder="500" min="0" step="50" required>
+                <input type="number" id="monthlyContribution" class="form-input" value="500" min="0" step="50">
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label" for="annualReturn">Expected Return (%)</label>
-                    <input type="number" id="annualReturn" class="form-input" placeholder="7" min="0" max="30" step="0.1" required>
+                    <input type="number" id="annualReturn" class="form-input" value="7" min="0" max="30" step="0.1">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="inflationRate">Inflation Rate (%)</label>
-                    <input type="number" id="inflationRate" class="form-input" placeholder="3" min="0" max="20" step="0.1" required>
+                    <input type="number" id="inflationRate" class="form-input" value="3" min="0" max="20" step="0.1">
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="desiredIncome">Desired Annual Income ($)</label>
-                <input type="number" id="desiredIncome" class="form-input" placeholder="60,000" min="0" step="1000" required>
+                <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000">
             </div>
 
-            <button type="submit" class="calculate-btn">Calculate</button>
-        </form>
+            <div class="results">
+                <div class="results-title">Your Results</div>
 
-        <div class="results" id="results">
-            <div class="results-title">Your Results</div>
+                <div class="result-item">
+                    <span class="result-label">Years until retirement</span>
+                    <span class="result-value" id="yearsToRetirement">—</span>
+                </div>
 
-            <div class="result-item">
-                <span class="result-label">Years until retirement</span>
-                <span class="result-value" id="yearsToRetirement">—</span>
-            </div>
+                <div class="result-item">
+                    <span class="result-label">Projected savings at retirement</span>
+                    <span class="result-value" id="projectedSavings">—</span>
+                </div>
 
-            <div class="result-item">
-                <span class="result-label">Projected savings at retirement</span>
-                <span class="result-value" id="projectedSavings">—</span>
-            </div>
+                <div class="result-item">
+                    <span class="result-label">Savings needed (4% rule)</span>
+                    <span class="result-value" id="savingsNeeded">—</span>
+                </div>
 
-            <div class="result-item">
-                <span class="result-label">Savings needed (4% rule)</span>
-                <span class="result-value" id="savingsNeeded">—</span>
-            </div>
+                <div class="result-item">
+                    <span class="result-label">Monthly income from savings</span>
+                    <span class="result-value" id="monthlyIncome">—</span>
+                </div>
 
-            <div class="result-item">
-                <span class="result-label">Monthly income from savings</span>
-                <span class="result-value" id="monthlyIncome">—</span>
-            </div>
-
-            <div class="result-summary" id="resultSummary">
-                <p class="summary-text" id="summaryText"></p>
+                <div class="result-summary">
+                    <p class="summary-text" id="summaryText"></p>
+                </div>
             </div>
         </div>
-    </div>
+
+        <div class="graph-panel">
+            <div class="graph-title">Savings Over Time</div>
+            <div class="graph-container">
+                <canvas id="graphCanvas" class="graph-canvas"></canvas>
+                <div class="graph-tooltip" id="graphTooltip">
+                    <div class="tooltip-year" id="tooltipYear"></div>
+                    <div class="tooltip-value" id="tooltipValue"></div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
+        // Graph data storage
+        let savingsData = [];
+
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
@@ -374,40 +404,56 @@
             }).format(amount);
         }
 
-        function calculateRetirement(e) {
-            e.preventDefault();
+        function formatCompact(amount) {
+            if (amount >= 1000000) {
+                return '$' + (amount / 1000000).toFixed(1) + 'M';
+            } else if (amount >= 1000) {
+                return '$' + (amount / 1000).toFixed(0) + 'K';
+            }
+            return '$' + amount.toFixed(0);
+        }
 
-            const currentAge = parseInt(document.getElementById('currentAge').value);
-            const retirementAge = parseInt(document.getElementById('retirementAge').value);
-            const currentSavings = parseFloat(document.getElementById('currentSavings').value);
-            const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value);
-            const annualReturn = parseFloat(document.getElementById('annualReturn').value) / 100;
-            const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
-            const desiredIncome = parseFloat(document.getElementById('desiredIncome').value);
+        function calculateRetirement() {
+            const currentAge = parseInt(document.getElementById('currentAge').value) || 30;
+            const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
+            const currentSavings = parseFloat(document.getElementById('currentSavings').value) || 0;
+            const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value) || 0;
+            const annualReturn = (parseFloat(document.getElementById('annualReturn').value) || 7) / 100;
+            const inflationRate = (parseFloat(document.getElementById('inflationRate').value) || 3) / 100;
+            const desiredIncome = parseFloat(document.getElementById('desiredIncome').value) || 60000;
 
-            // Validate inputs
+            // Validate
             if (retirementAge <= currentAge) {
-                alert('Retirement age must be greater than current age');
+                document.getElementById('yearsToRetirement').textContent = '—';
+                document.getElementById('projectedSavings').textContent = '—';
+                document.getElementById('savingsNeeded').textContent = '—';
+                document.getElementById('monthlyIncome').textContent = '—';
+                document.getElementById('summaryText').textContent = 'Retirement age must be greater than current age.';
+                savingsData = [];
+                drawGraph();
                 return;
             }
 
             const yearsToRetirement = retirementAge - currentAge;
-            const monthsToRetirement = yearsToRetirement * 12;
             const monthlyReturn = annualReturn / 12;
 
-            // Calculate future value of current savings
-            const futureValueCurrentSavings = currentSavings * Math.pow(1 + annualReturn, yearsToRetirement);
+            // Calculate savings over time for graph
+            savingsData = [];
+            let savings = currentSavings;
 
-            // Calculate future value of monthly contributions (future value of annuity)
-            let futureValueContributions = 0;
-            if (monthlyReturn > 0) {
-                futureValueContributions = monthlyContribution *
-                    ((Math.pow(1 + monthlyReturn, monthsToRetirement) - 1) / monthlyReturn);
-            } else {
-                futureValueContributions = monthlyContribution * monthsToRetirement;
+            for (let year = 0; year <= yearsToRetirement; year++) {
+                savingsData.push({
+                    year: currentAge + year,
+                    savings: savings
+                });
+
+                // Calculate next year's savings
+                for (let month = 0; month < 12; month++) {
+                    savings = savings * (1 + monthlyReturn) + monthlyContribution;
+                }
             }
 
-            const projectedSavings = futureValueCurrentSavings + futureValueContributions;
+            const projectedSavings = savingsData[savingsData.length - 1].savings;
 
             // Calculate inflation-adjusted desired income
             const inflationAdjustedIncome = desiredIncome * Math.pow(1 + inflationRate, yearsToRetirement);
@@ -433,24 +479,239 @@
 
             projectedElement.classList.remove('success', 'warning', 'error');
 
+            const monthsToRetirement = yearsToRetirement * 12;
+
             if (projectedSavings >= savingsNeeded) {
                 projectedElement.classList.add('success');
-                summaryElement.innerHTML = `You're on track! Your projected savings will be <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. You could potentially retire even earlier or increase your retirement income.`;
+                summaryElement.innerHTML = `You're on track! Your projected savings will be <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. You could potentially retire earlier or increase your retirement income.`;
             } else if (percentageOfGoal >= 75) {
                 projectedElement.classList.add('warning');
                 const shortfall = savingsNeeded - projectedSavings;
                 summaryElement.innerHTML = `You're close! You'll reach <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. Consider increasing your monthly contribution by <span class="summary-highlight">${formatCurrency(shortfall / monthsToRetirement)}</span> to close the gap.`;
             } else {
                 projectedElement.classList.add('error');
-                const shortfall = savingsNeeded - projectedSavings;
                 summaryElement.innerHTML = `You'll reach <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. To meet your target, consider increasing contributions, adjusting your retirement age, or revising your income expectations.`;
             }
 
-            // Show results
-            document.getElementById('results').classList.add('visible');
+            drawGraph();
         }
 
-        document.getElementById('retirementForm').addEventListener('submit', calculateRetirement);
+        function drawGraph() {
+            const canvas = document.getElementById('graphCanvas');
+            const ctx = canvas.getContext('2d');
+            const container = canvas.parentElement;
+
+            // Set canvas size for high DPI displays
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+            const padding = { top: 20, right: 20, bottom: 40, left: 70 };
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            if (savingsData.length < 2) {
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+                ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Enter valid data to see the graph', width / 2, height / 2);
+                return;
+            }
+
+            // Get CSS variables
+            const styles = getComputedStyle(document.documentElement);
+            const lineColor = styles.getPropertyValue('--graph-line').trim();
+            const fillColor = styles.getPropertyValue('--graph-fill').trim();
+            const gridColor = styles.getPropertyValue('--graph-grid').trim();
+            const textColor = styles.getPropertyValue('--text-muted').trim();
+
+            // Calculate scales
+            const minYear = savingsData[0].year;
+            const maxYear = savingsData[savingsData.length - 1].year;
+            const maxSavings = Math.max(...savingsData.map(d => d.savings));
+            const minSavings = 0;
+
+            // Round max savings up for nice grid lines
+            const magnitude = Math.pow(10, Math.floor(Math.log10(maxSavings)));
+            const niceMax = Math.ceil(maxSavings / magnitude) * magnitude;
+
+            const xScale = (year) => padding.left + ((year - minYear) / (maxYear - minYear)) * graphWidth;
+            const yScale = (savings) => padding.top + graphHeight - (savings / niceMax) * graphHeight;
+
+            // Draw grid lines
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+
+            // Horizontal grid lines
+            const numGridLines = 5;
+            for (let i = 0; i <= numGridLines; i++) {
+                const value = (niceMax / numGridLines) * i;
+                const y = yScale(value);
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+
+                // Y-axis labels
+                ctx.fillStyle = textColor;
+                ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(formatCompact(value), padding.left - 10, y);
+            }
+
+            ctx.setLineDash([]);
+
+            // Draw X-axis labels
+            const yearStep = Math.ceil((maxYear - minYear) / 6);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            for (let year = minYear; year <= maxYear; year += yearStep) {
+                const x = xScale(year);
+                ctx.fillText('Age ' + year, x, height - padding.bottom + 10);
+            }
+            // Always show last year
+            if ((maxYear - minYear) % yearStep !== 0) {
+                ctx.fillText('Age ' + maxYear, xScale(maxYear), height - padding.bottom + 10);
+            }
+
+            // Draw filled area
+            ctx.beginPath();
+            ctx.moveTo(xScale(savingsData[0].year), yScale(0));
+            savingsData.forEach(d => {
+                ctx.lineTo(xScale(d.year), yScale(d.savings));
+            });
+            ctx.lineTo(xScale(savingsData[savingsData.length - 1].year), yScale(0));
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+
+            // Draw line
+            ctx.beginPath();
+            ctx.moveTo(xScale(savingsData[0].year), yScale(savingsData[0].savings));
+            savingsData.forEach(d => {
+                ctx.lineTo(xScale(d.year), yScale(d.savings));
+            });
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Draw points
+            savingsData.forEach(d => {
+                ctx.beginPath();
+                ctx.arc(xScale(d.year), yScale(d.savings), 4, 0, Math.PI * 2);
+                ctx.fillStyle = lineColor;
+                ctx.fill();
+            });
+
+            // Store graph info for tooltip
+            canvas.graphInfo = {
+                padding,
+                xScale,
+                yScale,
+                minYear,
+                maxYear,
+                niceMax
+            };
+        }
+
+        // Tooltip handling
+        function handleMouseMove(e) {
+            const canvas = document.getElementById('graphCanvas');
+            const tooltip = document.getElementById('graphTooltip');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            if (!canvas.graphInfo || savingsData.length < 2) {
+                tooltip.classList.remove('visible');
+                return;
+            }
+
+            const { padding, xScale, minYear, maxYear } = canvas.graphInfo;
+            const graphWidth = rect.width - padding.left - padding.right;
+
+            // Check if mouse is in graph area
+            if (x < padding.left || x > rect.width - padding.right ||
+                y < padding.top || y > rect.height - padding.bottom) {
+                tooltip.classList.remove('visible');
+                return;
+            }
+
+            // Find closest data point
+            const yearFraction = ((x - padding.left) / graphWidth) * (maxYear - minYear) + minYear;
+            const closestIndex = Math.round(yearFraction - minYear);
+
+            if (closestIndex < 0 || closestIndex >= savingsData.length) {
+                tooltip.classList.remove('visible');
+                return;
+            }
+
+            const dataPoint = savingsData[closestIndex];
+            const pointX = xScale(dataPoint.year);
+            const pointY = canvas.graphInfo.yScale(dataPoint.savings);
+
+            // Check if close enough to point
+            const distance = Math.sqrt(Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2));
+            if (distance > 30) {
+                tooltip.classList.remove('visible');
+                return;
+            }
+
+            document.getElementById('tooltipYear').textContent = 'Age ' + dataPoint.year;
+            document.getElementById('tooltipValue').textContent = formatCurrency(dataPoint.savings);
+
+            // Position tooltip
+            let tooltipX = pointX + 15;
+            let tooltipY = pointY - 40;
+
+            // Keep tooltip in bounds
+            const tooltipRect = tooltip.getBoundingClientRect();
+            if (tooltipX + 120 > rect.width) {
+                tooltipX = pointX - 130;
+            }
+            if (tooltipY < 0) {
+                tooltipY = pointY + 15;
+            }
+
+            tooltip.style.left = tooltipX + 'px';
+            tooltip.style.top = tooltipY + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function handleMouseLeave() {
+            document.getElementById('graphTooltip').classList.remove('visible');
+        }
+
+        // Event listeners
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateRetirement);
+        });
+
+        const canvas = document.getElementById('graphCanvas');
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseleave', handleMouseLeave);
+
+        // Handle resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(drawGraph, 100);
+        });
+
+        // Initial calculation
+        calculateRetirement();
     </script>
 </body>
 </html>
