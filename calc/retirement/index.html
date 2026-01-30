@@ -627,6 +627,10 @@
             const ctx = canvas.getContext('2d');
             const container = canvas.parentElement;
 
+            // Reset canvas size before measuring to prevent feedback loop
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+
             // Set canvas size for high DPI displays
             const dpr = window.devicePixelRatio || 1;
             const rect = container.getBoundingClientRect();
