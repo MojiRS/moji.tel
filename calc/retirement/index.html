@@ -250,6 +250,9 @@
         }
 
         .graph-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
         }
@@ -627,17 +630,13 @@
             const ctx = canvas.getContext('2d');
             const container = canvas.parentElement;
 
-            // Reset canvas size before measuring to prevent feedback loop
-            canvas.style.width = '100%';
-            canvas.style.height = '100%';
+            // Get container size (canvas is position:absolute so won't affect this)
+            const rect = container.getBoundingClientRect();
 
             // Set canvas size for high DPI displays
             const dpr = window.devicePixelRatio || 1;
-            const rect = container.getBoundingClientRect();
             canvas.width = rect.width * dpr;
             canvas.height = rect.height * dpr;
-            canvas.style.width = rect.width + 'px';
-            canvas.style.height = rect.height + 'px';
             ctx.scale(dpr, dpr);
 
             const width = rect.width;
