@@ -33,6 +33,8 @@
             --graph-line: #8a7cb8;
             --graph-fill: rgba(138, 124, 184, 0.2);
             --graph-grid: #3a3a42;
+            --graph-line-min: #4ade80;
+            --graph-fill-min: rgba(74, 222, 128, 0.08);
         }
 
         @media (prefers-color-scheme: light) {
@@ -55,6 +57,8 @@
                 --graph-line: #7a6cb0;
                 --graph-fill: rgba(122, 108, 176, 0.15);
                 --graph-grid: #e0e0e5;
+                --graph-line-min: #22c55e;
+                --graph-fill-min: rgba(34, 197, 94, 0.08);
             }
         }
 
@@ -394,6 +398,8 @@
     <script>
         // Graph data storage
         let savingsData = [];
+        let minContributionData = [];
+        let retirementAgeGlobal = 65;
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', {
@@ -413,6 +419,108 @@
             return '$' + amount.toFixed(0);
         }
 
+        // Calculate the minimum monthly contribution needed to sustain desired income until age 100
+        function calculateMinContribution(currentAge, retirementAge, currentSavings, annualReturn, inflationRate, desiredIncome) {
+            const monthlyReturn = annualReturn / 12;
+            const monthlyInflation = Math.pow(1 + inflationRate, 1/12) - 1;
+            const yearsToRetirement = retirementAge - currentAge;
+            const monthsToRetirement = yearsToRetirement * 12;
+            const yearsInRetirement = 100 - retirementAge;
+
+            // Binary search for the minimum contribution
+            let low = 0;
+            let high = 50000; // Max reasonable monthly contribution
+            let minContribution = high;
+
+            for (let iter = 0; iter < 50; iter++) {
+                const mid = (low + high) / 2;
+
+                // Simulate with this contribution
+                let savings = currentSavings;
+
+                // Accumulation phase
+                for (let month = 0; month < monthsToRetirement; month++) {
+                    savings = savings * (1 + monthlyReturn) + mid;
+                }
+
+                // Withdrawal phase - check if savings last until 100
+                let monthlyWithdrawal = desiredIncome / 12;
+                // Adjust for inflation up to retirement
+                monthlyWithdrawal = monthlyWithdrawal * Math.pow(1 + inflationRate, yearsToRetirement);
+
+                let survived = true;
+                for (let year = 0; year < yearsInRetirement; year++) {
+                    // Adjust withdrawal for inflation each year
+                    const yearlyWithdrawal = monthlyWithdrawal * 12;
+
+                    for (let month = 0; month < 12; month++) {
+                        savings = savings * (1 + monthlyReturn) - (monthlyWithdrawal);
+                        if (savings < 0) {
+                            survived = false;
+                            break;
+                        }
+                    }
+                    if (!survived) break;
+
+                    // Increase withdrawal for next year's inflation
+                    monthlyWithdrawal = monthlyWithdrawal * (1 + inflationRate);
+                }
+
+                if (survived && savings >= 0) {
+                    minContribution = mid;
+                    high = mid;
+                } else {
+                    low = mid;
+                }
+            }
+
+            return minContribution;
+        }
+
+        // Generate savings trajectory for a given monthly contribution
+        function generateSavingsTrajectory(currentAge, retirementAge, currentSavings, monthlyContribution, annualReturn, inflationRate, desiredIncome) {
+            const data = [];
+            const monthlyReturn = annualReturn / 12;
+            const yearsToRetirement = retirementAge - currentAge;
+            let savings = currentSavings;
+
+            // Accumulation phase (current age to retirement)
+            for (let year = 0; year <= yearsToRetirement; year++) {
+                data.push({
+                    year: currentAge + year,
+                    savings: Math.max(0, savings)
+                });
+
+                if (year < yearsToRetirement) {
+                    for (let month = 0; month < 12; month++) {
+                        savings = savings * (1 + monthlyReturn) + monthlyContribution;
+                    }
+                }
+            }
+
+            // Withdrawal phase (retirement to age 100)
+            let monthlyWithdrawal = desiredIncome / 12;
+            // Adjust for inflation up to retirement
+            monthlyWithdrawal = monthlyWithdrawal * Math.pow(1 + inflationRate, yearsToRetirement);
+
+            const yearsInRetirement = 100 - retirementAge;
+            for (let year = 1; year <= yearsInRetirement; year++) {
+                for (let month = 0; month < 12; month++) {
+                    savings = savings * (1 + monthlyReturn) - monthlyWithdrawal;
+                }
+
+                data.push({
+                    year: retirementAge + year,
+                    savings: Math.max(0, savings)
+                });
+
+                // Increase withdrawal for next year's inflation
+                monthlyWithdrawal = monthlyWithdrawal * (1 + inflationRate);
+            }
+
+            return data;
+        }
+
         function calculateRetirement() {
             const currentAge = parseInt(document.getElementById('currentAge').value) || 30;
             const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
@@ -422,6 +530,8 @@
             const inflationRate = (parseFloat(document.getElementById('inflationRate').value) || 3) / 100;
             const desiredIncome = parseFloat(document.getElementById('desiredIncome').value) || 60000;
 
+            retirementAgeGlobal = retirementAge;
+
             // Validate
             if (retirementAge <= currentAge) {
                 document.getElementById('yearsToRetirement').textContent = '—';
@@ -430,32 +540,48 @@
                 document.getElementById('monthlyIncome').textContent = '—';
                 document.getElementById('summaryText').textContent = 'Retirement age must be greater than current age.';
                 savingsData = [];
+                minContributionData = [];
+                drawGraph();
+                return;
+            }
+
+            if (retirementAge >= 100) {
+                document.getElementById('yearsToRetirement').textContent = '—';
+                document.getElementById('projectedSavings').textContent = '—';
+                document.getElementById('savingsNeeded').textContent = '—';
+                document.getElementById('monthlyIncome').textContent = '—';
+                document.getElementById('summaryText').textContent = 'Retirement age must be less than 100.';
+                savingsData = [];
+                minContributionData = [];
                 drawGraph();
                 return;
             }
 
             const yearsToRetirement = retirementAge - currentAge;
-            const monthlyReturn = annualReturn / 12;
 
-            // Calculate savings over time for graph
-            savingsData = [];
-            let savings = currentSavings;
+            // Generate main savings trajectory (with user's contribution)
+            savingsData = generateSavingsTrajectory(
+                currentAge, retirementAge, currentSavings,
+                monthlyContribution, annualReturn, inflationRate, desiredIncome
+            );
 
-            for (let year = 0; year <= yearsToRetirement; year++) {
-                savingsData.push({
-                    year: currentAge + year,
-                    savings: savings
-                });
+            // Calculate minimum required contribution
+            const minContribution = calculateMinContribution(
+                currentAge, retirementAge, currentSavings,
+                annualReturn, inflationRate, desiredIncome
+            );
 
-                // Calculate next year's savings
-                for (let month = 0; month < 12; month++) {
-                    savings = savings * (1 + monthlyReturn) + monthlyContribution;
-                }
-            }
+            // Generate minimum contribution trajectory
+            minContributionData = generateSavingsTrajectory(
+                currentAge, retirementAge, currentSavings,
+                minContribution, annualReturn, inflationRate, desiredIncome
+            );
 
-            const projectedSavings = savingsData[savingsData.length - 1].savings;
+            // Get projected savings at retirement (from main trajectory)
+            const retirementIndex = yearsToRetirement;
+            const projectedSavings = savingsData[retirementIndex].savings;
 
-            // Calculate inflation-adjusted desired income
+            // Calculate inflation-adjusted desired income at retirement
             const inflationAdjustedIncome = desiredIncome * Math.pow(1 + inflationRate, yearsToRetirement);
 
             // Calculate savings needed using 4% rule
@@ -480,17 +606,17 @@
             projectedElement.classList.remove('success', 'warning', 'error');
 
             const monthsToRetirement = yearsToRetirement * 12;
+            const contributionDiff = minContribution - monthlyContribution;
 
-            if (projectedSavings >= savingsNeeded) {
+            if (monthlyContribution >= minContribution) {
                 projectedElement.classList.add('success');
-                summaryElement.innerHTML = `You're on track! Your projected savings will be <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. You could potentially retire earlier or increase your retirement income.`;
-            } else if (percentageOfGoal >= 75) {
+                summaryElement.innerHTML = `You're on track! Your savings will last until age 100. You could potentially retire earlier or increase your retirement income.`;
+            } else if (contributionDiff < 200) {
                 projectedElement.classList.add('warning');
-                const shortfall = savingsNeeded - projectedSavings;
-                summaryElement.innerHTML = `You're close! You'll reach <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. Consider increasing your monthly contribution by <span class="summary-highlight">${formatCurrency(shortfall / monthsToRetirement)}</span> to close the gap.`;
+                summaryElement.innerHTML = `You're close! Increase your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span> to ensure your savings last until age 100.`;
             } else {
                 projectedElement.classList.add('error');
-                summaryElement.innerHTML = `You'll reach <span class="summary-highlight">${Math.round(percentageOfGoal)}%</span> of your goal. To meet your target, consider increasing contributions, adjusting your retirement age, or revising your income expectations.`;
+                summaryElement.innerHTML = `Your savings may run out before age 100. Consider increasing your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span>, adjusting your retirement age, or reducing your desired income.`;
             }
 
             drawGraph();
@@ -533,16 +659,18 @@
             const fillColor = styles.getPropertyValue('--graph-fill').trim();
             const gridColor = styles.getPropertyValue('--graph-grid').trim();
             const textColor = styles.getPropertyValue('--text-muted').trim();
+            const lineColorMin = styles.getPropertyValue('--graph-line-min').trim();
+            const fillColorMin = styles.getPropertyValue('--graph-fill-min').trim();
 
-            // Calculate scales
+            // Calculate scales - use both datasets to find max
             const minYear = savingsData[0].year;
             const maxYear = savingsData[savingsData.length - 1].year;
-            const maxSavings = Math.max(...savingsData.map(d => d.savings));
-            const minSavings = 0;
+            const allSavings = [...savingsData.map(d => d.savings), ...minContributionData.map(d => d.savings)];
+            const maxSavings = Math.max(...allSavings);
 
             // Round max savings up for nice grid lines
-            const magnitude = Math.pow(10, Math.floor(Math.log10(maxSavings)));
-            const niceMax = Math.ceil(maxSavings / magnitude) * magnitude;
+            const magnitude = Math.pow(10, Math.floor(Math.log10(maxSavings || 1)));
+            const niceMax = Math.ceil(maxSavings / magnitude) * magnitude || 100000;
 
             const xScale = (year) => padding.left + ((year - minYear) / (maxYear - minYear)) * graphWidth;
             const yScale = (savings) => padding.top + graphHeight - (savings / niceMax) * graphHeight;
@@ -572,10 +700,29 @@
 
             ctx.setLineDash([]);
 
+            // Draw retirement age vertical line
+            if (retirementAgeGlobal > minYear && retirementAgeGlobal < maxYear) {
+                ctx.strokeStyle = gridColor;
+                ctx.lineWidth = 1;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.moveTo(xScale(retirementAgeGlobal), padding.top);
+                ctx.lineTo(xScale(retirementAgeGlobal), height - padding.bottom);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Label for retirement
+                ctx.fillStyle = textColor;
+                ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Retirement', xScale(retirementAgeGlobal), padding.top - 8);
+            }
+
             // Draw X-axis labels
-            const yearStep = Math.ceil((maxYear - minYear) / 6);
+            const yearStep = Math.ceil((maxYear - minYear) / 7);
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
+            ctx.fillStyle = textColor;
             for (let year = minYear; year <= maxYear; year += yearStep) {
                 const x = xScale(year);
                 ctx.fillText('Age ' + year, x, height - padding.bottom + 10);
@@ -585,7 +732,33 @@
                 ctx.fillText('Age ' + maxYear, xScale(maxYear), height - padding.bottom + 10);
             }
 
-            // Draw filled area
+            // Draw minimum contribution plot first (so it's behind the main plot)
+            if (minContributionData.length >= 2) {
+                // Filled area
+                ctx.beginPath();
+                ctx.moveTo(xScale(minContributionData[0].year), yScale(0));
+                minContributionData.forEach(d => {
+                    ctx.lineTo(xScale(d.year), yScale(d.savings));
+                });
+                ctx.lineTo(xScale(minContributionData[minContributionData.length - 1].year), yScale(0));
+                ctx.closePath();
+                ctx.fillStyle = fillColorMin;
+                ctx.fill();
+
+                // Line
+                ctx.beginPath();
+                ctx.moveTo(xScale(minContributionData[0].year), yScale(minContributionData[0].savings));
+                minContributionData.forEach(d => {
+                    ctx.lineTo(xScale(d.year), yScale(d.savings));
+                });
+                ctx.strokeStyle = lineColorMin;
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.5;
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+            }
+
+            // Draw main savings filled area
             ctx.beginPath();
             ctx.moveTo(xScale(savingsData[0].year), yScale(0));
             savingsData.forEach(d => {
@@ -596,7 +769,7 @@
             ctx.fillStyle = fillColor;
             ctx.fill();
 
-            // Draw line
+            // Draw main savings line
             ctx.beginPath();
             ctx.moveTo(xScale(savingsData[0].year), yScale(savingsData[0].savings));
             savingsData.forEach(d => {
@@ -606,13 +779,44 @@
             ctx.lineWidth = 2.5;
             ctx.stroke();
 
-            // Draw points
-            savingsData.forEach(d => {
-                ctx.beginPath();
-                ctx.arc(xScale(d.year), yScale(d.savings), 4, 0, Math.PI * 2);
-                ctx.fillStyle = lineColor;
-                ctx.fill();
+            // Draw points on main line (only every few years to avoid clutter)
+            const pointInterval = Math.max(1, Math.floor(savingsData.length / 15));
+            savingsData.forEach((d, i) => {
+                if (i % pointInterval === 0 || i === savingsData.length - 1 || d.year === retirementAgeGlobal) {
+                    ctx.beginPath();
+                    ctx.arc(xScale(d.year), yScale(d.savings), 4, 0, Math.PI * 2);
+                    ctx.fillStyle = lineColor;
+                    ctx.fill();
+                }
             });
+
+            // Draw legend
+            const legendX = width - padding.right - 180;
+            const legendY = padding.top + 10;
+
+            // Main plot legend
+            ctx.beginPath();
+            ctx.moveTo(legendX, legendY + 6);
+            ctx.lineTo(legendX + 20, legendY + 6);
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.fillStyle = textColor;
+            ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Your savings', legendX + 26, legendY + 10);
+
+            // Min contribution legend
+            ctx.beginPath();
+            ctx.moveTo(legendX, legendY + 26);
+            ctx.lineTo(legendX + 20, legendY + 26);
+            ctx.strokeStyle = lineColorMin;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.5;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = textColor;
+            ctx.fillText('Min. required', legendX + 26, legendY + 30);
 
             // Store graph info for tooltip
             canvas.graphInfo = {
@@ -638,7 +842,7 @@
                 return;
             }
 
-            const { padding, xScale, minYear, maxYear } = canvas.graphInfo;
+            const { padding, xScale, yScale, minYear, maxYear } = canvas.graphInfo;
             const graphWidth = rect.width - padding.left - padding.right;
 
             // Check if mouse is in graph area
@@ -648,9 +852,10 @@
                 return;
             }
 
-            // Find closest data point
+            // Find closest year based on x position
             const yearFraction = ((x - padding.left) / graphWidth) * (maxYear - minYear) + minYear;
-            const closestIndex = Math.round(yearFraction - minYear);
+            const closestYear = Math.round(yearFraction);
+            const closestIndex = closestYear - minYear;
 
             if (closestIndex < 0 || closestIndex >= savingsData.length) {
                 tooltip.classList.remove('visible');
@@ -658,27 +863,25 @@
             }
 
             const dataPoint = savingsData[closestIndex];
+            const minDataPoint = minContributionData[closestIndex];
             const pointX = xScale(dataPoint.year);
-            const pointY = canvas.graphInfo.yScale(dataPoint.savings);
+            const pointY = yScale(dataPoint.savings);
 
-            // Check if close enough to point
-            const distance = Math.sqrt(Math.pow(x - pointX, 2) + Math.pow(y - pointY, 2));
-            if (distance > 30) {
-                tooltip.classList.remove('visible');
-                return;
+            document.getElementById('tooltipYear').textContent = 'Age ' + dataPoint.year + (dataPoint.year >= retirementAgeGlobal ? ' (retired)' : '');
+
+            let tooltipContent = formatCurrency(dataPoint.savings);
+            if (minDataPoint && Math.abs(minDataPoint.savings - dataPoint.savings) > 1000) {
+                tooltipContent += ` (min: ${formatCurrency(minDataPoint.savings)})`;
             }
-
-            document.getElementById('tooltipYear').textContent = 'Age ' + dataPoint.year;
-            document.getElementById('tooltipValue').textContent = formatCurrency(dataPoint.savings);
+            document.getElementById('tooltipValue').textContent = tooltipContent;
 
             // Position tooltip
             let tooltipX = pointX + 15;
             let tooltipY = pointY - 40;
 
             // Keep tooltip in bounds
-            const tooltipRect = tooltip.getBoundingClientRect();
-            if (tooltipX + 120 > rect.width) {
-                tooltipX = pointX - 130;
+            if (tooltipX + 180 > rect.width) {
+                tooltipX = pointX - 190;
             }
             if (tooltipY < 0) {
                 tooltipY = pointY + 15;
