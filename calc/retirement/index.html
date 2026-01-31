@@ -1125,26 +1125,35 @@
             document.getElementById('savingsNeeded').textContent = formatCurrency(savingsNeeded);
             document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncomeFromSavings);
 
-            // Determine status and update styling
+            // Determine status by checking if actual savings last through retirement
+            // (checking the trajectory is more accurate than comparing contribution amounts
+            // because it accounts for different account splits and tax implications)
             const projectedElement = document.getElementById('projectedSavings');
             const summaryElement = document.getElementById('summaryText');
 
             projectedElement.classList.remove('success', 'warning', 'error');
 
+            // Check if savings last through retirement by looking at final savings
+            // and finding the minimum savings during retirement years
+            const finalSavings = savingsData[savingsData.length - 1].savings;
+            const retirementYearSavings = savingsData.slice(retirementIndex);
+            const minSavingsDuringRetirement = Math.min(...retirementYearSavings.map(d => d.savings));
+
+            // Calculate contribution difference for messaging (how much more needed)
             const contributionDiff = minContribution - totalMonthlyContribution;
 
-            if (totalMonthlyContribution >= minContribution) {
+            if (minSavingsDuringRetirement > 0 && finalSavings > 0) {
                 isSufficientGlobal = true;
                 projectedElement.classList.add('success');
                 summaryElement.innerHTML = `You're on track! Your savings will last until age ${lifeExpectancy}. You could potentially retire earlier or increase your retirement income.`;
-            } else if (contributionDiff < 200) {
+            } else if (contributionDiff < 200 && contributionDiff > 0) {
                 isSufficientGlobal = false;
                 projectedElement.classList.add('warning');
                 summaryElement.innerHTML = `You're close! Increase your monthly contributions by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span> to ensure your savings last until age ${lifeExpectancy}.`;
             } else {
                 isSufficientGlobal = false;
                 projectedElement.classList.add('error');
-                summaryElement.innerHTML = `Your savings may run out before age ${lifeExpectancy}. Consider increasing your monthly contributions by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span>, adjusting your retirement age, or reducing your desired income.`;
+                summaryElement.innerHTML = `Your savings may run out before age ${lifeExpectancy}. Consider increasing your monthly contributions by <span class="summary-highlight">${formatCurrency(Math.max(0, contributionDiff))}</span>, adjusting your retirement age, or reducing your desired income.`;
             }
 
             drawGraph();
