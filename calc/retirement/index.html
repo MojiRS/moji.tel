@@ -110,7 +110,7 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 420px 1fr;
             gap: 40px;
             padding: 40px;
             min-height: calc(100vh - 85px);
@@ -119,7 +119,7 @@
         .calculator-panel {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 16px;
         }
 
         .form-group {
@@ -158,6 +158,152 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 16px;
+        }
+
+        /* Collapsible sections */
+        .form-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .form-section__header {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            cursor: pointer;
+            user-select: none;
+            gap: 12px;
+        }
+
+        .form-section__header:hover {
+            background: var(--input-bg);
+        }
+
+        .form-section__title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .form-section__summary {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-left: auto;
+        }
+
+        .form-section__header-input {
+            flex-shrink: 0;
+            width: 120px;
+            padding: 10px 12px;
+            font-size: 14px;
+            margin-left: auto;
+        }
+
+        .form-section__toggle {
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+            transition: transform 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .form-section.collapsed .form-section__toggle {
+            transform: rotate(-90deg);
+        }
+
+        .form-section__content {
+            padding: 0 16px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-section.collapsed .form-section__content {
+            display: none;
+        }
+
+        /* Contribution row with toggle */
+        .contribution-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .contribution-toggle {
+            display: flex;
+            gap: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--input-border);
+        }
+
+        .toggle-btn {
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--input-bg);
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn.active {
+            background: var(--highlight-border);
+            color: var(--text-primary);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            background: var(--card-border);
+        }
+
+        /* Employer match checkbox */
+        .match-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .match-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--highlight-color);
+            cursor: pointer;
+        }
+
+        .match-row label {
+            cursor: pointer;
+        }
+
+        .match-input {
+            width: 60px;
+            padding: 6px 8px;
+            font-size: 13px;
+        }
+
+        .match-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Contribution item wrapper */
+        .contribution-item {
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .contribution-item:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
         }
 
         .results {
@@ -330,6 +476,7 @@
 
     <main class="main-content">
         <div class="calculator-panel">
+            <!-- Age Settings (unchanged) -->
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label" for="currentAge">Current Age</label>
@@ -345,29 +492,153 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="currentSavings">Current Savings ($)</label>
-                <input type="number" id="currentSavings" class="form-input" value="50000" min="0" step="1000">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="monthlyContribution">Monthly Contribution ($)</label>
-                <input type="number" id="monthlyContribution" class="form-input" value="1000" min="0" step="50">
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="annualReturn">Expected Return (%)</label>
-                    <input type="number" id="annualReturn" class="form-input" value="7" min="0" max="30" step="0.1">
+            <!-- Income Section (collapsed by default) -->
+            <div class="form-section collapsed" id="incomeSection">
+                <div class="form-section__header" onclick="toggleSection(this)">
+                    <span class="form-section__title">Income</span>
+                    <input type="number" id="currentIncome" class="form-input form-section__header-input" value="75000" min="0" step="1000" onclick="event.stopPropagation()">
+                    <svg class="form-section__toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="inflationRate">Inflation Rate (%)</label>
-                    <input type="number" id="inflationRate" class="form-input" value="2.5" min="0" max="20" step="0.1">
+                <div class="form-section__content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="incomeGrowthRate">Annual Increase (%)</label>
+                            <input type="number" id="incomeGrowthRate" class="form-input" value="3" min="0" max="20" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="incomeAtRetirement">At Retirement (Today's $)</label>
+                            <input type="number" id="incomeAtRetirement" class="form-input" value="75000" min="0" step="1000">
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Current Savings Section (expanded by default) -->
+            <div class="form-section" id="savingsSection">
+                <div class="form-section__header" onclick="toggleSection(this)">
+                    <span class="form-section__title">Current Savings</span>
+                    <span class="form-section__summary" id="totalSavingsSummary">$50,000</span>
+                    <svg class="form-section__toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="form-section__content">
+                    <div class="form-group">
+                        <label class="form-label" for="traditionalSavings">Traditional (Tax-Deferred)</label>
+                        <input type="number" id="traditionalSavings" class="form-input" value="30000" min="0" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="rothSavings">Roth (Tax-Free)</label>
+                        <input type="number" id="rothSavings" class="form-input" value="15000" min="0" step="1000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="taxableSavings">Taxable Brokerage</label>
+                        <input type="number" id="taxableSavings" class="form-input" value="5000" min="0" step="1000">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contributions Section (expanded by default) -->
+            <div class="form-section" id="contributionsSection">
+                <div class="form-section__header" onclick="toggleSection(this)">
+                    <span class="form-section__title">Contributions</span>
+                    <span class="form-section__summary" id="totalContributionsSummary">$12,000/yr</span>
+                    <svg class="form-section__toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="form-section__content">
+                    <!-- Traditional contribution -->
+                    <div class="contribution-item">
+                        <div class="contribution-header">
+                            <label class="form-label">Traditional (Tax-Deferred)</label>
+                            <div class="contribution-toggle">
+                                <button type="button" class="toggle-btn active" data-target="traditionalContribution" data-type="dollar">$</button>
+                                <button type="button" class="toggle-btn" data-target="traditionalContribution" data-type="percent">%</button>
+                            </div>
+                        </div>
+                        <input type="number" id="traditionalContribution" class="form-input" value="500" min="0" step="50" data-mode="dollar">
+                        <div class="match-row">
+                            <input type="checkbox" id="traditionalMatchEnabled">
+                            <label for="traditionalMatchEnabled">Employer match</label>
+                            <input type="number" id="traditionalMatchPercent" class="form-input match-input" value="3" min="0" max="100" step="0.5" disabled>
+                            <span>% of income</span>
+                        </div>
+                    </div>
+
+                    <!-- Roth contribution -->
+                    <div class="contribution-item">
+                        <div class="contribution-header">
+                            <label class="form-label">Roth (Tax-Free)</label>
+                            <div class="contribution-toggle">
+                                <button type="button" class="toggle-btn active" data-target="rothContribution" data-type="dollar">$</button>
+                                <button type="button" class="toggle-btn" data-target="rothContribution" data-type="percent">%</button>
+                            </div>
+                        </div>
+                        <input type="number" id="rothContribution" class="form-input" value="300" min="0" step="50" data-mode="dollar">
+                        <div class="match-row">
+                            <input type="checkbox" id="rothMatchEnabled">
+                            <label for="rothMatchEnabled">Employer match</label>
+                            <input type="number" id="rothMatchPercent" class="form-input match-input" value="0" min="0" max="100" step="0.5" disabled>
+                            <span>% of income</span>
+                        </div>
+                    </div>
+
+                    <!-- Taxable contribution -->
+                    <div class="contribution-item">
+                        <div class="contribution-header">
+                            <label class="form-label">Taxable Brokerage</label>
+                            <div class="contribution-toggle">
+                                <button type="button" class="toggle-btn active" data-target="taxableContribution" data-type="dollar">$</button>
+                                <button type="button" class="toggle-btn" data-target="taxableContribution" data-type="percent">%</button>
+                            </div>
+                        </div>
+                        <input type="number" id="taxableContribution" class="form-input" value="200" min="0" step="50" data-mode="dollar">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assumptions Section (collapsed by default) -->
+            <div class="form-section collapsed" id="assumptionsSection">
+                <div class="form-section__header" onclick="toggleSection(this)">
+                    <span class="form-section__title">Assumptions</span>
+                    <svg class="form-section__toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div class="form-section__content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="preRetirementReturn">Return (Pre-Retire) %</label>
+                            <input type="number" id="preRetirementReturn" class="form-input" value="7" min="0" max="30" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="postRetirementReturn">Return (Post-Retire) %</label>
+                            <input type="number" id="postRetirementReturn" class="form-input" value="5" min="0" max="30" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="inflationRate">Inflation Rate (%)</label>
+                        <input type="number" id="inflationRate" class="form-input" value="2.5" min="0" max="20" step="0.1">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="currentTaxRate">Current Tax Rate (%)</label>
+                            <input type="number" id="currentTaxRate" class="form-input" value="24" min="0" max="60" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="retirementTaxRate">Retirement Tax Rate (%)</label>
+                            <input type="number" id="retirementTaxRate" class="form-input" value="20" min="0" max="60" step="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desired Retirement Income -->
             <div class="form-group">
-                <label class="form-label" for="desiredIncome">Desired Annual Income ($)</label>
+                <label class="form-label" for="desiredIncome">Desired Annual Retirement Income ($)</label>
                 <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000">
             </div>
 
@@ -421,6 +692,9 @@
         let lifeExpectancyGlobal = 100;
         let isSufficientGlobal = false;
 
+        // Track which field was last edited for income sync
+        let lastIncomeFieldEdited = null;
+
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
@@ -439,53 +713,218 @@
             return '$' + amount.toFixed(0);
         }
 
-        // Calculate the minimum monthly contribution needed to sustain desired income until life expectancy
-        function calculateMinContribution(currentAge, retirementAge, currentSavings, annualReturn, inflationRate, desiredIncome, lifeExpectancy) {
-            const monthlyReturn = annualReturn / 12;
-            const yearsToRetirement = retirementAge - currentAge;
-            const monthsToRetirement = yearsToRetirement * 12;
-            const yearsInRetirement = lifeExpectancy - retirementAge;
+        // Toggle section expand/collapse
+        function toggleSection(headerElement) {
+            const section = headerElement.closest('.form-section');
+            section.classList.toggle('collapsed');
+        }
 
-            // Binary search for the minimum contribution
+        // Get all input values
+        function getInputValues() {
+            const currentAge = parseInt(document.getElementById('currentAge').value) || 30;
+            const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
+            const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value) || 95;
+
+            const currentIncome = parseFloat(document.getElementById('currentIncome').value) || 75000;
+            const incomeGrowthRate = (parseFloat(document.getElementById('incomeGrowthRate').value) || 3) / 100;
+
+            const traditionalSavings = parseFloat(document.getElementById('traditionalSavings').value) || 0;
+            const rothSavings = parseFloat(document.getElementById('rothSavings').value) || 0;
+            const taxableSavings = parseFloat(document.getElementById('taxableSavings').value) || 0;
+
+            const traditionalContribInput = document.getElementById('traditionalContribution');
+            const rothContribInput = document.getElementById('rothContribution');
+            const taxableContribInput = document.getElementById('taxableContribution');
+
+            const traditionalMatchEnabled = document.getElementById('traditionalMatchEnabled').checked;
+            const traditionalMatchPercent = traditionalMatchEnabled ?
+                (parseFloat(document.getElementById('traditionalMatchPercent').value) || 0) / 100 : 0;
+            const rothMatchEnabled = document.getElementById('rothMatchEnabled').checked;
+            const rothMatchPercent = rothMatchEnabled ?
+                (parseFloat(document.getElementById('rothMatchPercent').value) || 0) / 100 : 0;
+
+            const preRetirementReturn = (parseFloat(document.getElementById('preRetirementReturn').value) || 7) / 100;
+            const postRetirementReturn = (parseFloat(document.getElementById('postRetirementReturn').value) || 5) / 100;
+            const inflationRate = (parseFloat(document.getElementById('inflationRate').value) || 2.5) / 100;
+            const currentTaxRate = (parseFloat(document.getElementById('currentTaxRate').value) || 24) / 100;
+            const retirementTaxRate = (parseFloat(document.getElementById('retirementTaxRate').value) || 20) / 100;
+
+            const desiredIncome = parseFloat(document.getElementById('desiredIncome').value) || 60000;
+
+            // Calculate monthly contributions based on mode ($ or %)
+            function getMonthlyContribution(inputId, annualIncome) {
+                const input = document.getElementById(inputId);
+                const value = parseFloat(input.value) || 0;
+                const mode = input.dataset.mode || 'dollar';
+
+                if (mode === 'percent') {
+                    return (annualIncome * (value / 100)) / 12;
+                }
+                return value; // Already monthly dollar amount
+            }
+
+            const traditionalContribution = getMonthlyContribution('traditionalContribution', currentIncome);
+            const rothContribution = getMonthlyContribution('rothContribution', currentIncome);
+            const taxableContribution = getMonthlyContribution('taxableContribution', currentIncome);
+
+            // Add employer match (always as % of income)
+            const traditionalWithMatch = traditionalContribution + (currentIncome * traditionalMatchPercent / 12);
+            const rothWithMatch = rothContribution + (currentIncome * rothMatchPercent / 12);
+
+            return {
+                currentAge,
+                retirementAge,
+                lifeExpectancy,
+                currentIncome,
+                incomeGrowthRate,
+                traditionalSavings,
+                rothSavings,
+                taxableSavings,
+                traditionalContribution: traditionalWithMatch,
+                rothContribution: rothWithMatch,
+                taxableContribution,
+                traditionalMatchPercent,
+                rothMatchPercent,
+                preRetirementReturn,
+                postRetirementReturn,
+                inflationRate,
+                currentTaxRate,
+                retirementTaxRate,
+                desiredIncome
+            };
+        }
+
+        // Sync income fields (growth rate <-> at retirement income)
+        function syncIncomeFields(changedField) {
+            const currentAge = parseInt(document.getElementById('currentAge').value) || 30;
+            const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
+            const yearsToRetirement = retirementAge - currentAge;
+            const currentIncome = parseFloat(document.getElementById('currentIncome').value) || 75000;
+            const inflationRate = (parseFloat(document.getElementById('inflationRate').value) || 2.5) / 100;
+
+            if (yearsToRetirement <= 0) return;
+
+            if (changedField === 'growthRate' || changedField === 'currentIncome') {
+                const growthRate = (parseFloat(document.getElementById('incomeGrowthRate').value) || 0) / 100;
+                // Income at retirement in future (nominal) dollars
+                const futureIncome = currentIncome * Math.pow(1 + growthRate, yearsToRetirement);
+                // Convert to today's dollars by removing inflation
+                const realIncome = futureIncome / Math.pow(1 + inflationRate, yearsToRetirement);
+                document.getElementById('incomeAtRetirement').value = Math.round(realIncome);
+            } else if (changedField === 'atRetirement') {
+                const targetRealIncome = parseFloat(document.getElementById('incomeAtRetirement').value) || currentIncome;
+                // Target in future (nominal) dollars
+                const targetFutureIncome = targetRealIncome * Math.pow(1 + inflationRate, yearsToRetirement);
+                // Calculate required growth rate: futureIncome = currentIncome * (1 + g)^years
+                // g = (futureIncome / currentIncome)^(1/years) - 1
+                if (currentIncome > 0) {
+                    const requiredGrowth = Math.pow(targetFutureIncome / currentIncome, 1 / yearsToRetirement) - 1;
+                    document.getElementById('incomeGrowthRate').value = (requiredGrowth * 100).toFixed(2);
+                }
+            }
+        }
+
+        // Update summary displays
+        function updateSummaries() {
+            const traditionalSavings = parseFloat(document.getElementById('traditionalSavings').value) || 0;
+            const rothSavings = parseFloat(document.getElementById('rothSavings').value) || 0;
+            const taxableSavings = parseFloat(document.getElementById('taxableSavings').value) || 0;
+            const totalSavings = traditionalSavings + rothSavings + taxableSavings;
+            document.getElementById('totalSavingsSummary').textContent = formatCurrency(totalSavings);
+
+            // Calculate yearly contributions
+            const currentIncome = parseFloat(document.getElementById('currentIncome').value) || 75000;
+            const values = getInputValues();
+            const yearlyContributions = (values.traditionalContribution + values.rothContribution + values.taxableContribution) * 12;
+            document.getElementById('totalContributionsSummary').textContent = formatCurrency(yearlyContributions) + '/yr';
+        }
+
+        // Calculate minimum contribution needed across all accounts
+        function calculateMinContribution(inputs) {
+            const { currentAge, retirementAge, lifeExpectancy,
+                    traditionalSavings, rothSavings, taxableSavings,
+                    currentIncome, incomeGrowthRate,
+                    preRetirementReturn, postRetirementReturn,
+                    inflationRate, retirementTaxRate, desiredIncome } = inputs;
+
+            const yearsToRetirement = retirementAge - currentAge;
+            const yearsInRetirement = lifeExpectancy - retirementAge;
+            const preMonthlyReturn = preRetirementReturn / 12;
+            const postMonthlyReturn = postRetirementReturn / 12;
+
+            // Binary search for minimum monthly contribution (total across all accounts)
             let low = 0;
-            let high = 50000; // Max reasonable monthly contribution
+            let high = 50000;
             let minContribution = high;
 
             for (let iter = 0; iter < 50; iter++) {
                 const mid = (low + high) / 2;
 
-                // Simulate with this contribution
-                let savings = currentSavings;
+                // Simulate accumulation with this contribution
+                let traditional = traditionalSavings;
+                let roth = rothSavings;
+                let taxable = taxableSavings;
+                let income = currentIncome;
+
+                // Distribute contribution proportionally: 60% traditional, 30% roth, 10% taxable
+                const tradContrib = mid * 0.6;
+                const rothContrib = mid * 0.3;
+                const taxContrib = mid * 0.1;
 
                 // Accumulation phase
-                for (let month = 0; month < monthsToRetirement; month++) {
-                    savings = savings * (1 + monthlyReturn) + mid;
+                for (let year = 0; year < yearsToRetirement; year++) {
+                    for (let month = 0; month < 12; month++) {
+                        traditional = traditional * (1 + preMonthlyReturn) + tradContrib;
+                        roth = roth * (1 + preMonthlyReturn) + rothContrib;
+                        taxable = taxable * (1 + preMonthlyReturn) + taxContrib;
+                    }
+                    income *= (1 + incomeGrowthRate);
                 }
 
-                // Withdrawal phase - check if savings last until life expectancy
+                // Withdrawal phase
                 let monthlyWithdrawal = desiredIncome / 12;
-                // Adjust for inflation up to retirement
-                monthlyWithdrawal = monthlyWithdrawal * Math.pow(1 + inflationRate, yearsToRetirement);
+                monthlyWithdrawal *= Math.pow(1 + inflationRate, yearsToRetirement);
 
                 let survived = true;
-                for (let year = 0; year < yearsInRetirement; year++) {
-                    // Adjust withdrawal for inflation each year
-                    const yearlyWithdrawal = monthlyWithdrawal * 12;
+                for (let year = 0; year < yearsInRetirement && survived; year++) {
+                    for (let month = 0; month < 12 && survived; month++) {
+                        traditional *= (1 + postMonthlyReturn);
+                        roth *= (1 + postMonthlyReturn);
+                        taxable *= (1 + postMonthlyReturn);
 
-                    for (let month = 0; month < 12; month++) {
-                        savings = savings * (1 + monthlyReturn) - (monthlyWithdrawal);
-                        if (savings < 0) {
+                        let remaining = monthlyWithdrawal;
+
+                        // Withdraw from taxable first
+                        if (remaining > 0 && taxable > 0) {
+                            const fromTaxable = Math.min(remaining, taxable);
+                            taxable -= fromTaxable;
+                            remaining -= fromTaxable;
+                        }
+
+                        // Then traditional (need to gross up for taxes)
+                        if (remaining > 0 && traditional > 0) {
+                            const grossNeeded = remaining / (1 - retirementTaxRate);
+                            const fromTraditional = Math.min(grossNeeded, traditional);
+                            traditional -= fromTraditional;
+                            remaining -= fromTraditional * (1 - retirementTaxRate);
+                        }
+
+                        // Finally Roth (tax-free)
+                        if (remaining > 0 && roth > 0) {
+                            const fromRoth = Math.min(remaining, roth);
+                            roth -= fromRoth;
+                            remaining -= fromRoth;
+                        }
+
+                        // Check if we ran out of money
+                        if (remaining > 0.01) {
                             survived = false;
-                            break;
                         }
                     }
-                    if (!survived) break;
-
-                    // Increase withdrawal for next year's inflation
-                    monthlyWithdrawal = monthlyWithdrawal * (1 + inflationRate);
+                    monthlyWithdrawal *= (1 + inflationRate);
                 }
 
-                if (survived && savings >= 0) {
+                if (survived) {
                     minContribution = mid;
                     high = mid;
                 } else {
@@ -496,59 +935,133 @@
             return minContribution;
         }
 
-        // Generate savings trajectory for a given monthly contribution
-        function generateSavingsTrajectory(currentAge, retirementAge, currentSavings, monthlyContribution, annualReturn, inflationRate, desiredIncome, lifeExpectancy) {
-            const data = [];
-            const monthlyReturn = annualReturn / 12;
-            const yearsToRetirement = retirementAge - currentAge;
-            let savings = currentSavings;
+        // Generate savings trajectory with multiple account types
+        function generateSavingsTrajectory(inputs, monthlyContribOverride = null) {
+            const { currentAge, retirementAge, lifeExpectancy,
+                    traditionalSavings, rothSavings, taxableSavings,
+                    traditionalContribution, rothContribution, taxableContribution,
+                    currentIncome, incomeGrowthRate,
+                    traditionalMatchPercent, rothMatchPercent,
+                    preRetirementReturn, postRetirementReturn,
+                    inflationRate, retirementTaxRate, desiredIncome } = inputs;
 
-            // Accumulation phase (current age to retirement)
+            const data = [];
+            const yearsToRetirement = retirementAge - currentAge;
+            const yearsInRetirement = lifeExpectancy - retirementAge;
+            const preMonthlyReturn = preRetirementReturn / 12;
+            const postMonthlyReturn = postRetirementReturn / 12;
+
+            let traditional = traditionalSavings;
+            let roth = rothSavings;
+            let taxable = taxableSavings;
+            let income = currentIncome;
+
+            // Use override for minimum contribution calculation, or actual contributions
+            let tradContrib, rothContrib, taxContrib;
+            if (monthlyContribOverride !== null) {
+                tradContrib = monthlyContribOverride * 0.6;
+                rothContrib = monthlyContribOverride * 0.3;
+                taxContrib = monthlyContribOverride * 0.1;
+            } else {
+                tradContrib = traditionalContribution;
+                rothContrib = rothContribution;
+                taxContrib = taxableContribution;
+            }
+
+            // Accumulation phase
             for (let year = 0; year <= yearsToRetirement; year++) {
                 data.push({
                     year: currentAge + year,
-                    savings: Math.max(0, savings)
+                    traditional: Math.max(0, traditional),
+                    roth: Math.max(0, roth),
+                    taxable: Math.max(0, taxable),
+                    savings: Math.max(0, traditional + roth + taxable)
                 });
 
                 if (year < yearsToRetirement) {
-                    for (let month = 0; month < 12; month++) {
-                        savings = savings * (1 + monthlyReturn) + monthlyContribution;
+                    // Recalculate contributions if they're percentage-based (income changes yearly)
+                    if (monthlyContribOverride === null) {
+                        const tradInput = document.getElementById('traditionalContribution');
+                        const rothInput = document.getElementById('rothContribution');
+                        const taxInput = document.getElementById('taxableContribution');
+
+                        if (tradInput.dataset.mode === 'percent') {
+                            tradContrib = (income * (parseFloat(tradInput.value) || 0) / 100) / 12;
+                            tradContrib += income * traditionalMatchPercent / 12;
+                        }
+                        if (rothInput.dataset.mode === 'percent') {
+                            rothContrib = (income * (parseFloat(rothInput.value) || 0) / 100) / 12;
+                            rothContrib += income * rothMatchPercent / 12;
+                        }
+                        if (taxInput.dataset.mode === 'percent') {
+                            taxContrib = (income * (parseFloat(taxInput.value) || 0) / 100) / 12;
+                        }
                     }
+
+                    for (let month = 0; month < 12; month++) {
+                        traditional = traditional * (1 + preMonthlyReturn) + tradContrib;
+                        roth = roth * (1 + preMonthlyReturn) + rothContrib;
+                        taxable = taxable * (1 + preMonthlyReturn) + taxContrib;
+                    }
+                    income *= (1 + incomeGrowthRate);
                 }
             }
 
-            // Withdrawal phase (retirement to life expectancy)
+            // Withdrawal phase
             let monthlyWithdrawal = desiredIncome / 12;
-            // Adjust for inflation up to retirement
-            monthlyWithdrawal = monthlyWithdrawal * Math.pow(1 + inflationRate, yearsToRetirement);
+            monthlyWithdrawal *= Math.pow(1 + inflationRate, yearsToRetirement);
 
-            const yearsInRetirement = lifeExpectancy - retirementAge;
             for (let year = 1; year <= yearsInRetirement; year++) {
                 for (let month = 0; month < 12; month++) {
-                    savings = savings * (1 + monthlyReturn) - monthlyWithdrawal;
+                    traditional *= (1 + postMonthlyReturn);
+                    roth *= (1 + postMonthlyReturn);
+                    taxable *= (1 + postMonthlyReturn);
+
+                    let remaining = monthlyWithdrawal;
+
+                    // Withdraw from taxable first (capital gains, typically lower tax)
+                    if (remaining > 0 && taxable > 0) {
+                        const fromTaxable = Math.min(remaining, taxable);
+                        taxable -= fromTaxable;
+                        remaining -= fromTaxable;
+                    }
+
+                    // Then traditional (need to gross up for income taxes)
+                    if (remaining > 0 && traditional > 0) {
+                        const grossNeeded = remaining / (1 - retirementTaxRate);
+                        const fromTraditional = Math.min(grossNeeded, traditional);
+                        traditional -= fromTraditional;
+                        remaining -= fromTraditional * (1 - retirementTaxRate);
+                    }
+
+                    // Finally Roth (tax-free)
+                    if (remaining > 0 && roth > 0) {
+                        const fromRoth = Math.min(remaining, roth);
+                        roth -= fromRoth;
+                        remaining -= fromRoth;
+                    }
                 }
 
                 data.push({
                     year: retirementAge + year,
-                    savings: Math.max(0, savings)
+                    traditional: Math.max(0, traditional),
+                    roth: Math.max(0, roth),
+                    taxable: Math.max(0, taxable),
+                    savings: Math.max(0, traditional + roth + taxable)
                 });
 
-                // Increase withdrawal for next year's inflation
-                monthlyWithdrawal = monthlyWithdrawal * (1 + inflationRate);
+                monthlyWithdrawal *= (1 + inflationRate);
             }
 
             return data;
         }
 
         function calculateRetirement() {
-            const currentAge = parseInt(document.getElementById('currentAge').value) || 30;
-            const retirementAge = parseInt(document.getElementById('retirementAge').value) || 65;
-            const currentSavings = parseFloat(document.getElementById('currentSavings').value) || 0;
-            const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value) || 0;
-            const annualReturn = (parseFloat(document.getElementById('annualReturn').value) || 7) / 100;
-            const inflationRate = (parseFloat(document.getElementById('inflationRate').value) || 3) / 100;
-            const desiredIncome = parseFloat(document.getElementById('desiredIncome').value) || 60000;
-            const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value) || 100;
+            updateSummaries();
+
+            const inputs = getInputValues();
+            const { currentAge, retirementAge, lifeExpectancy, inflationRate, desiredIncome,
+                    traditionalContribution, rothContribution, taxableContribution } = inputs;
 
             retirementAgeGlobal = retirementAge;
             lifeExpectancyGlobal = lifeExpectancy;
@@ -580,23 +1093,14 @@
 
             const yearsToRetirement = retirementAge - currentAge;
 
-            // Generate main savings trajectory (with user's contribution)
-            savingsData = generateSavingsTrajectory(
-                currentAge, retirementAge, currentSavings,
-                monthlyContribution, annualReturn, inflationRate, desiredIncome, lifeExpectancy
-            );
+            // Generate main savings trajectory (with user's contributions)
+            savingsData = generateSavingsTrajectory(inputs);
 
             // Calculate minimum required contribution
-            const minContribution = calculateMinContribution(
-                currentAge, retirementAge, currentSavings,
-                annualReturn, inflationRate, desiredIncome, lifeExpectancy
-            );
+            const minContribution = calculateMinContribution(inputs);
 
             // Generate minimum contribution trajectory
-            minContributionData = generateSavingsTrajectory(
-                currentAge, retirementAge, currentSavings,
-                minContribution, annualReturn, inflationRate, desiredIncome, lifeExpectancy
-            );
+            minContributionData = generateSavingsTrajectory(inputs, minContribution);
 
             // Get projected savings at retirement (from main trajectory)
             const retirementIndex = yearsToRetirement;
@@ -612,6 +1116,9 @@
             const annualIncomeFromSavings = projectedSavings * 0.04;
             const monthlyIncomeFromSavings = annualIncomeFromSavings / 12;
 
+            // Total monthly contributions
+            const totalMonthlyContribution = traditionalContribution + rothContribution + taxableContribution;
+
             // Update DOM
             document.getElementById('yearsToRetirement').textContent = yearsToRetirement + ' years';
             document.getElementById('projectedSavings').textContent = formatCurrency(projectedSavings);
@@ -622,25 +1129,22 @@
             const projectedElement = document.getElementById('projectedSavings');
             const summaryElement = document.getElementById('summaryText');
 
-            const percentageOfGoal = (projectedSavings / savingsNeeded) * 100;
-
             projectedElement.classList.remove('success', 'warning', 'error');
 
-            const monthsToRetirement = yearsToRetirement * 12;
-            const contributionDiff = minContribution - monthlyContribution;
+            const contributionDiff = minContribution - totalMonthlyContribution;
 
-            if (monthlyContribution >= minContribution) {
+            if (totalMonthlyContribution >= minContribution) {
                 isSufficientGlobal = true;
                 projectedElement.classList.add('success');
                 summaryElement.innerHTML = `You're on track! Your savings will last until age ${lifeExpectancy}. You could potentially retire earlier or increase your retirement income.`;
             } else if (contributionDiff < 200) {
                 isSufficientGlobal = false;
                 projectedElement.classList.add('warning');
-                summaryElement.innerHTML = `You're close! Increase your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span> to ensure your savings last until age ${lifeExpectancy}.`;
+                summaryElement.innerHTML = `You're close! Increase your monthly contributions by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span> to ensure your savings last until age ${lifeExpectancy}.`;
             } else {
                 isSufficientGlobal = false;
                 projectedElement.classList.add('error');
-                summaryElement.innerHTML = `Your savings may run out before age ${lifeExpectancy}. Consider increasing your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span>, adjusting your retirement age, or reducing your desired income.`;
+                summaryElement.innerHTML = `Your savings may run out before age ${lifeExpectancy}. Consider increasing your monthly contributions by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span>, adjusting your retirement age, or reducing your desired income.`;
             }
 
             drawGraph();
@@ -933,11 +1437,81 @@
             document.getElementById('graphTooltip').classList.remove('visible');
         }
 
-        // Event listeners
-        const inputs = document.querySelectorAll('.form-input');
-        inputs.forEach(input => {
-            input.addEventListener('input', calculateRetirement);
-        });
+        // Event listeners for all form inputs
+        function initializeEventListeners() {
+            // General input listener
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    // Special handling for income-related fields
+                    if (e.target.id === 'incomeGrowthRate') {
+                        syncIncomeFields('growthRate');
+                    } else if (e.target.id === 'incomeAtRetirement') {
+                        syncIncomeFields('atRetirement');
+                    } else if (e.target.id === 'currentIncome') {
+                        syncIncomeFields('currentIncome');
+                    } else if (e.target.id === 'currentAge' || e.target.id === 'retirementAge' || e.target.id === 'inflationRate') {
+                        // These affect income sync, update the at-retirement income
+                        syncIncomeFields('growthRate');
+                    }
+                    calculateRetirement();
+                });
+            });
+
+            // Toggle buttons for contribution mode ($ vs %)
+            const toggleButtons = document.querySelectorAll('.toggle-btn');
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const targetId = btn.dataset.target;
+                    const newMode = btn.dataset.type;
+                    const input = document.getElementById(targetId);
+                    const currentIncome = parseFloat(document.getElementById('currentIncome').value) || 75000;
+                    const currentValue = parseFloat(input.value) || 0;
+
+                    // Update active state
+                    const container = btn.closest('.contribution-toggle');
+                    container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    // Convert value if switching modes
+                    const oldMode = input.dataset.mode || 'dollar';
+                    if (oldMode !== newMode) {
+                        if (newMode === 'percent') {
+                            // Convert monthly $ to % of annual income
+                            const annualContrib = currentValue * 12;
+                            const percent = (annualContrib / currentIncome) * 100;
+                            input.value = percent.toFixed(1);
+                            input.step = '0.5';
+                        } else {
+                            // Convert % to monthly $
+                            const monthlyAmount = (currentIncome * (currentValue / 100)) / 12;
+                            input.value = Math.round(monthlyAmount);
+                            input.step = '50';
+                        }
+                        input.dataset.mode = newMode;
+                    }
+
+                    calculateRetirement();
+                });
+            });
+
+            // Employer match checkboxes
+            const matchCheckboxes = ['traditionalMatchEnabled', 'rothMatchEnabled'];
+            matchCheckboxes.forEach(id => {
+                const checkbox = document.getElementById(id);
+                const inputId = id.replace('Enabled', 'Percent');
+                const input = document.getElementById(inputId);
+
+                checkbox.addEventListener('change', () => {
+                    input.disabled = !checkbox.checked;
+                    calculateRetirement();
+                });
+            });
+
+            // Match percentage inputs
+            document.getElementById('traditionalMatchPercent').addEventListener('input', calculateRetirement);
+            document.getElementById('rothMatchPercent').addEventListener('input', calculateRetirement);
+        }
 
         const canvas = document.getElementById('graphCanvas');
         canvas.addEventListener('mousemove', handleMouseMove);
@@ -950,7 +1524,9 @@
             resizeTimeout = setTimeout(drawGraph, 100);
         });
 
-        // Initial calculation
+        // Initialize
+        initializeEventListeners();
+        syncIncomeFields('growthRate'); // Set initial income at retirement value
         calculateRetirement();
     </script>
 </body>
