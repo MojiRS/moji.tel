@@ -1328,17 +1328,6 @@
             ctx.lineWidth = 2.5;
             ctx.stroke();
 
-            // Draw points on main line (only every few years to avoid clutter)
-            const pointInterval = Math.max(1, Math.floor(savingsData.length / 15));
-            savingsData.forEach((d, i) => {
-                if (i % pointInterval === 0 || i === savingsData.length - 1 || d.year === retirementAgeGlobal) {
-                    ctx.beginPath();
-                    ctx.arc(xScale(d.year), yScale(d.savings), 4, 0, Math.PI * 2);
-                    ctx.fillStyle = lineColor;
-                    ctx.fill();
-                }
-            });
-
             // Draw legend
             const legendX = width - padding.right - 180;
             const legendY = padding.top + 10;
