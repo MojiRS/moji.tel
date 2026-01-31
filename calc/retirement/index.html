@@ -30,11 +30,13 @@
             --success-color: #4ade80;
             --warning-color: #fbbf24;
             --error-color: #f87171;
-            --graph-line: #8a7cb8;
-            --graph-fill: rgba(138, 124, 184, 0.2);
             --graph-grid: #3a3a42;
-            --graph-line-min: #4ade80;
-            --graph-fill-min: rgba(74, 222, 128, 0.08);
+            --graph-line-success: #4ade80;
+            --graph-fill-success: rgba(74, 222, 128, 0.2);
+            --graph-line-error: #f87171;
+            --graph-fill-error: rgba(248, 113, 113, 0.2);
+            --graph-line-min: #888;
+            --graph-fill-min: rgba(136, 136, 136, 0.08);
         }
 
         @media (prefers-color-scheme: light) {
@@ -54,11 +56,13 @@
                 --success-color: #22c55e;
                 --warning-color: #f59e0b;
                 --error-color: #ef4444;
-                --graph-line: #7a6cb0;
-                --graph-fill: rgba(122, 108, 176, 0.15);
                 --graph-grid: #e0e0e5;
-                --graph-line-min: #22c55e;
-                --graph-fill-min: rgba(34, 197, 94, 0.08);
+                --graph-line-success: #22c55e;
+                --graph-fill-success: rgba(34, 197, 94, 0.15);
+                --graph-line-error: #ef4444;
+                --graph-fill-error: rgba(239, 68, 68, 0.15);
+                --graph-line-min: #999;
+                --graph-fill-min: rgba(153, 153, 153, 0.08);
             }
         }
 
@@ -352,9 +356,15 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="desiredIncome">Desired Annual Income ($)</label>
-                <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="desiredIncome">Desired Annual Income ($)</label>
+                    <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="lifeExpectancy">Life Expectancy</label>
+                    <input type="number" id="lifeExpectancy" class="form-input" value="100" min="50" max="120">
+                </div>
             </div>
 
             <div class="results">
@@ -403,6 +413,8 @@
         let savingsData = [];
         let minContributionData = [];
         let retirementAgeGlobal = 65;
+        let lifeExpectancyGlobal = 100;
+        let isSufficientGlobal = false;
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', {
@@ -422,13 +434,12 @@
             return '$' + amount.toFixed(0);
         }
 
-        // Calculate the minimum monthly contribution needed to sustain desired income until age 100
-        function calculateMinContribution(currentAge, retirementAge, currentSavings, annualReturn, inflationRate, desiredIncome) {
+        // Calculate the minimum monthly contribution needed to sustain desired income until life expectancy
+        function calculateMinContribution(currentAge, retirementAge, currentSavings, annualReturn, inflationRate, desiredIncome, lifeExpectancy) {
             const monthlyReturn = annualReturn / 12;
-            const monthlyInflation = Math.pow(1 + inflationRate, 1/12) - 1;
             const yearsToRetirement = retirementAge - currentAge;
             const monthsToRetirement = yearsToRetirement * 12;
-            const yearsInRetirement = 100 - retirementAge;
+            const yearsInRetirement = lifeExpectancy - retirementAge;
 
             // Binary search for the minimum contribution
             let low = 0;
@@ -446,7 +457,7 @@
                     savings = savings * (1 + monthlyReturn) + mid;
                 }
 
-                // Withdrawal phase - check if savings last until 100
+                // Withdrawal phase - check if savings last until life expectancy
                 let monthlyWithdrawal = desiredIncome / 12;
                 // Adjust for inflation up to retirement
                 monthlyWithdrawal = monthlyWithdrawal * Math.pow(1 + inflationRate, yearsToRetirement);
@@ -481,7 +492,7 @@
         }
 
         // Generate savings trajectory for a given monthly contribution
-        function generateSavingsTrajectory(currentAge, retirementAge, currentSavings, monthlyContribution, annualReturn, inflationRate, desiredIncome) {
+        function generateSavingsTrajectory(currentAge, retirementAge, currentSavings, monthlyContribution, annualReturn, inflationRate, desiredIncome, lifeExpectancy) {
             const data = [];
             const monthlyReturn = annualReturn / 12;
             const yearsToRetirement = retirementAge - currentAge;
@@ -501,12 +512,12 @@
                 }
             }
 
-            // Withdrawal phase (retirement to age 100)
+            // Withdrawal phase (retirement to life expectancy)
             let monthlyWithdrawal = desiredIncome / 12;
             // Adjust for inflation up to retirement
             monthlyWithdrawal = monthlyWithdrawal * Math.pow(1 + inflationRate, yearsToRetirement);
 
-            const yearsInRetirement = 100 - retirementAge;
+            const yearsInRetirement = lifeExpectancy - retirementAge;
             for (let year = 1; year <= yearsInRetirement; year++) {
                 for (let month = 0; month < 12; month++) {
                     savings = savings * (1 + monthlyReturn) - monthlyWithdrawal;
@@ -532,8 +543,10 @@
             const annualReturn = (parseFloat(document.getElementById('annualReturn').value) || 7) / 100;
             const inflationRate = (parseFloat(document.getElementById('inflationRate').value) || 3) / 100;
             const desiredIncome = parseFloat(document.getElementById('desiredIncome').value) || 60000;
+            const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value) || 100;
 
             retirementAgeGlobal = retirementAge;
+            lifeExpectancyGlobal = lifeExpectancy;
 
             // Validate
             if (retirementAge <= currentAge) {
@@ -548,12 +561,12 @@
                 return;
             }
 
-            if (retirementAge >= 100) {
+            if (retirementAge >= lifeExpectancy) {
                 document.getElementById('yearsToRetirement').textContent = '—';
                 document.getElementById('projectedSavings').textContent = '—';
                 document.getElementById('savingsNeeded').textContent = '—';
                 document.getElementById('monthlyIncome').textContent = '—';
-                document.getElementById('summaryText').textContent = 'Retirement age must be less than 100.';
+                document.getElementById('summaryText').textContent = 'Retirement age must be less than life expectancy.';
                 savingsData = [];
                 minContributionData = [];
                 drawGraph();
@@ -565,19 +578,19 @@
             // Generate main savings trajectory (with user's contribution)
             savingsData = generateSavingsTrajectory(
                 currentAge, retirementAge, currentSavings,
-                monthlyContribution, annualReturn, inflationRate, desiredIncome
+                monthlyContribution, annualReturn, inflationRate, desiredIncome, lifeExpectancy
             );
 
             // Calculate minimum required contribution
             const minContribution = calculateMinContribution(
                 currentAge, retirementAge, currentSavings,
-                annualReturn, inflationRate, desiredIncome
+                annualReturn, inflationRate, desiredIncome, lifeExpectancy
             );
 
             // Generate minimum contribution trajectory
             minContributionData = generateSavingsTrajectory(
                 currentAge, retirementAge, currentSavings,
-                minContribution, annualReturn, inflationRate, desiredIncome
+                minContribution, annualReturn, inflationRate, desiredIncome, lifeExpectancy
             );
 
             // Get projected savings at retirement (from main trajectory)
@@ -612,14 +625,17 @@
             const contributionDiff = minContribution - monthlyContribution;
 
             if (monthlyContribution >= minContribution) {
+                isSufficientGlobal = true;
                 projectedElement.classList.add('success');
-                summaryElement.innerHTML = `You're on track! Your savings will last until age 100. You could potentially retire earlier or increase your retirement income.`;
+                summaryElement.innerHTML = `You're on track! Your savings will last until age ${lifeExpectancy}. You could potentially retire earlier or increase your retirement income.`;
             } else if (contributionDiff < 200) {
+                isSufficientGlobal = false;
                 projectedElement.classList.add('warning');
-                summaryElement.innerHTML = `You're close! Increase your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span> to ensure your savings last until age 100.`;
+                summaryElement.innerHTML = `You're close! Increase your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span> to ensure your savings last until age ${lifeExpectancy}.`;
             } else {
+                isSufficientGlobal = false;
                 projectedElement.classList.add('error');
-                summaryElement.innerHTML = `Your savings may run out before age 100. Consider increasing your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span>, adjusting your retirement age, or reducing your desired income.`;
+                summaryElement.innerHTML = `Your savings may run out before age ${lifeExpectancy}. Consider increasing your monthly contribution by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span>, adjusting your retirement age, or reducing your desired income.`;
             }
 
             drawGraph();
@@ -658,12 +674,18 @@
 
             // Get CSS variables
             const styles = getComputedStyle(document.documentElement);
-            const lineColor = styles.getPropertyValue('--graph-line').trim();
-            const fillColor = styles.getPropertyValue('--graph-fill').trim();
             const gridColor = styles.getPropertyValue('--graph-grid').trim();
             const textColor = styles.getPropertyValue('--text-muted').trim();
             const lineColorMin = styles.getPropertyValue('--graph-line-min').trim();
             const fillColorMin = styles.getPropertyValue('--graph-fill-min').trim();
+
+            // Main plot color based on sufficiency
+            const lineColor = isSufficientGlobal
+                ? styles.getPropertyValue('--graph-line-success').trim()
+                : styles.getPropertyValue('--graph-line-error').trim();
+            const fillColor = isSufficientGlobal
+                ? styles.getPropertyValue('--graph-fill-success').trim()
+                : styles.getPropertyValue('--graph-fill-error').trim();
 
             // Calculate scales - use both datasets to find max
             const minYear = savingsData[0].year;
@@ -756,7 +778,7 @@
                 });
                 ctx.strokeStyle = lineColorMin;
                 ctx.lineWidth = 2;
-                ctx.globalAlpha = 0.5;
+                ctx.globalAlpha = 0.6;
                 ctx.stroke();
                 ctx.globalAlpha = 1;
             }
@@ -809,17 +831,17 @@
             ctx.textAlign = 'left';
             ctx.fillText('Your savings', legendX + 26, legendY + 10);
 
-            // Min contribution legend
+            // Min target legend
             ctx.beginPath();
             ctx.moveTo(legendX, legendY + 26);
             ctx.lineTo(legendX + 20, legendY + 26);
             ctx.strokeStyle = lineColorMin;
             ctx.lineWidth = 2;
-            ctx.globalAlpha = 0.5;
+            ctx.globalAlpha = 0.6;
             ctx.stroke();
             ctx.globalAlpha = 1;
             ctx.fillStyle = textColor;
-            ctx.fillText('Min. required', legendX + 26, legendY + 30);
+            ctx.fillText('Min. target', legendX + 26, legendY + 30);
 
             // Store graph info for tooltip
             canvas.graphInfo = {
