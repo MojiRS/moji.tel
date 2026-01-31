@@ -290,6 +290,12 @@
             color: var(--highlight-color);
         }
 
+        .tooltip-target {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
         @media (max-width: 1000px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -335,7 +341,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="lifeExpectancy">Life Expectancy</label>
-                    <input type="number" id="lifeExpectancy" class="form-input" value="100" min="50" max="120">
+                    <input type="number" id="lifeExpectancy" class="form-input" value="95" min="50" max="120">
                 </div>
             </div>
 
@@ -346,7 +352,7 @@
 
             <div class="form-group">
                 <label class="form-label" for="monthlyContribution">Monthly Contribution ($)</label>
-                <input type="number" id="monthlyContribution" class="form-input" value="500" min="0" step="50">
+                <input type="number" id="monthlyContribution" class="form-input" value="1000" min="0" step="50">
             </div>
 
             <div class="form-row">
@@ -356,7 +362,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="inflationRate">Inflation Rate (%)</label>
-                    <input type="number" id="inflationRate" class="form-input" value="3" min="0" max="20" step="0.1">
+                    <input type="number" id="inflationRate" class="form-input" value="2.5" min="0" max="20" step="0.1">
                 </div>
             </div>
 
@@ -401,6 +407,7 @@
                 <div class="graph-tooltip" id="graphTooltip">
                     <div class="tooltip-year" id="tooltipYear"></div>
                     <div class="tooltip-value" id="tooltipValue"></div>
+                    <div class="tooltip-target" id="tooltipTarget"></div>
                 </div>
             </div>
         </div>
@@ -693,9 +700,10 @@
             const minSavingsAtRetirement = minContributionData[retirementIndex]?.savings || 0;
             const maxSavingsAtRetirement = Math.max(savingsAtRetirement, minSavingsAtRetirement);
 
-            // Round max savings up for nice grid lines
-            const magnitude = Math.pow(10, Math.floor(Math.log10(maxSavingsAtRetirement || 1)));
-            const niceMax = Math.ceil(maxSavingsAtRetirement / magnitude) * magnitude || 100000;
+            // Scale y-axis so retirement savings is ~80% of max
+            const targetMax = maxSavingsAtRetirement / 0.8;
+            const magnitude = Math.pow(10, Math.floor(Math.log10(targetMax || 1)));
+            const niceMax = Math.ceil(targetMax / magnitude) * magnitude || 100000;
 
             const xScale = (year) => padding.left + ((year - minYear) / (maxYear - minYear)) * graphWidth;
             const yScale = (savings) => padding.top + graphHeight - (savings / niceMax) * graphHeight;
@@ -748,13 +756,16 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.fillStyle = textColor;
+            let isFirstLabel = true;
             for (let year = minYear; year <= maxYear; year += yearStep) {
                 const x = xScale(year);
-                ctx.fillText('Age ' + year, x, height - padding.bottom + 10);
+                const label = isFirstLabel ? 'Age ' + year : String(year);
+                ctx.fillText(label, x, height - padding.bottom + 10);
+                isFirstLabel = false;
             }
             // Always show last year
             if ((maxYear - minYear) % yearStep !== 0) {
-                ctx.fillText('Age ' + maxYear, xScale(maxYear), height - padding.bottom + 10);
+                ctx.fillText(String(maxYear), xScale(maxYear), height - padding.bottom + 10);
             }
 
             // Draw minimum contribution plot first (so it's behind the main plot)
@@ -892,13 +903,14 @@
             const pointX = xScale(dataPoint.year);
             const pointY = yScale(dataPoint.savings);
 
-            document.getElementById('tooltipYear').textContent = 'Age ' + dataPoint.year + (dataPoint.year >= retirementAgeGlobal ? ' (retired)' : '');
+            document.getElementById('tooltipYear').textContent = 'Age ' + dataPoint.year;
+            document.getElementById('tooltipValue').textContent = 'Savings: ' + formatCurrency(dataPoint.savings);
 
-            let tooltipContent = formatCurrency(dataPoint.savings);
-            if (minDataPoint && Math.abs(minDataPoint.savings - dataPoint.savings) > 1000) {
-                tooltipContent += ` (min: ${formatCurrency(minDataPoint.savings)})`;
+            if (minDataPoint) {
+                document.getElementById('tooltipTarget').textContent = 'Target: ' + formatCurrency(minDataPoint.savings);
+            } else {
+                document.getElementById('tooltipTarget').textContent = '';
             }
-            document.getElementById('tooltipValue').textContent = tooltipContent;
 
             // Position tooltip
             let tooltipX = pointX + 15;
