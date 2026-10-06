@@ -89,7 +89,8 @@
             gap: 16px;
         }
 
-        .back-button {
+        .back-button,
+        .icon-button {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -104,9 +105,27 @@
             font-size: 18px;
         }
 
-        .back-button:hover {
+        .back-button:hover,
+        .icon-button:hover {
             border-color: var(--highlight-border);
             color: var(--highlight-color);
+        }
+
+        .icon-button {
+            cursor: pointer;
+            padding: 0;
+            font-family: inherit;
+        }
+
+        .icon-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
         }
 
         .page-title {
@@ -243,10 +262,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 12px;
             margin-bottom: 8px;
         }
 
         .contribution-toggle {
+            flex-shrink: 0;
             display: flex;
             gap: 0;
             border-radius: 6px;
@@ -263,6 +284,7 @@
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .toggle-btn.active {
@@ -295,14 +317,27 @@
             cursor: pointer;
         }
 
-        .match-input {
-            width: 60px;
-            padding: 6px 8px;
+        .input-affix.match-input {
+            width: 64px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+
+        .match-input .form-input,
+        .match-input .form-input:focus {
+            padding: 6px 2px 6px 8px;
             font-size: 13px;
         }
 
-        .match-input:disabled {
+        .match-input .input-affix__suffix {
+            padding-right: 8px;
+        }
+
+        .match-input:has(.form-input:disabled) {
             opacity: 0.5;
+        }
+
+        .match-input .form-input:disabled {
             cursor: not-allowed;
         }
 
@@ -405,6 +440,92 @@
             color: var(--text-muted);
         }
 
+        /* Contribution amount + annual increase, side by side ($ mode only) */
+        .contribution-inputs {
+            display: flex;
+            gap: 12px;
+        }
+
+        .contribution-inputs > * {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .contribution-item.is-percent .contribution-increase {
+            display: none;
+        }
+
+        /* Input with a unit suffix inside the box */
+        .input-affix {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .input-affix:focus-within {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px var(--highlight-shadow);
+        }
+
+        .input-affix .form-input,
+        .input-affix .form-input:focus {
+            min-width: 0;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            padding-right: 4px;
+        }
+
+        .input-affix__suffix {
+            padding-right: 14px;
+            font-size: inherit;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .input-affix__prefix {
+            padding-left: 16px;
+            font-size: inherit;
+            color: var(--text-muted);
+        }
+
+        .input-affix__prefix + .form-input {
+            padding-left: 4px;
+        }
+
+        .input-affix .form-input:last-child {
+            padding-right: 16px;
+        }
+
+        /* $ only applies to dollar-mode contributions */
+        .contribution-item.is-percent .input-affix__prefix {
+            display: none;
+        }
+
+        .contribution-item.is-percent .input-affix__prefix + .form-input {
+            padding-left: 16px;
+        }
+
+        /* Income input inside the Income section header */
+        .input-affix.form-section__header-input {
+            padding: 0;
+            font-size: 14px;
+        }
+
+        .form-section__header-input .input-affix__prefix {
+            padding-left: 12px;
+        }
+
+        .form-section__header-input .form-input,
+        .form-section__header-input .form-input:focus {
+            padding: 10px 12px 10px 4px;
+            font-size: 14px;
+        }
+
         /* Contribution item wrapper */
         .contribution-item {
             padding-bottom: 16px;
@@ -501,13 +622,21 @@
             min-height: 360px;
         }
 
+        .graph-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
         .graph-title {
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             color: var(--text-muted);
-            margin-bottom: 20px;
         }
 
         .graph-container {
@@ -559,6 +688,16 @@
             margin-top: 4px;
         }
 
+        .tooltip-breakdown {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--card-border);
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
         @media (max-width: 1000px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -580,10 +719,26 @@
         @media (max-width: 500px) {
             .page-header {
                 padding: 14px 24px;
+                gap: 12px;
+            }
+
+            .page-title {
+                font-size: 18px;
+            }
+
+            .back-button,
+            .icon-button {
+                width: 32px;
+                height: 32px;
             }
 
             .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            /* Shorten "%/yr increase" so the contribution increase field has room */
+            .suffix-long {
+                display: none;
             }
 
             /* Anchor tooltips to their whole row so they can't run off-screen */
@@ -609,6 +764,20 @@
     <header class="page-header">
         <a href="../" class="back-button" title="Back to Calculators">&larr;</a>
         <h1 class="page-title">Retirement Calculator</h1>
+        <div class="header-actions">
+            <button type="button" class="icon-button" id="copyLinkButton" title="Copy a link to this calculation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+            </button>
+            <button type="button" class="icon-button" id="resetButton" title="Reset to defaults">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                    <polyline points="3 3 3 9 9 9"></polyline>
+                </svg>
+            </button>
+        </div>
     </header>
 
     <main class="main-content">
@@ -633,7 +802,10 @@
             <div class="form-section collapsed" id="incomeSection">
                 <div class="form-section__header" onclick="toggleSection(this)">
                     <span class="form-section__title">Income</span>
-                    <input type="number" id="currentIncome" class="form-input form-section__header-input" value="75000" min="0" step="1000" onclick="event.stopPropagation()">
+                    <div class="input-affix form-section__header-input" onclick="event.stopPropagation()">
+                        <span class="input-affix__prefix">$</span>
+                        <input type="number" id="currentIncome" class="form-input" value="75000" min="0" step="1000">
+                    </div>
                     <svg class="form-section__toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
@@ -641,12 +813,18 @@
                 <div class="form-section__content">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" for="incomeGrowthRate">Annual Increase (%)</label>
-                            <input type="number" id="incomeGrowthRate" class="form-input" value="3" min="0" max="20" step="0.1">
+                            <label class="form-label" for="incomeGrowthRate">Annual Increase</label>
+                            <div class="input-affix">
+                                <input type="number" id="incomeGrowthRate" class="form-input" value="3" min="0" max="20" step="0.1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="incomeAtRetirement">At Retirement (Today's $)</label>
-                            <input type="number" id="incomeAtRetirement" class="form-input" value="75000" min="0" step="1000">
+                            <div class="input-affix">
+                                <span class="input-affix__prefix">$</span>
+                                <input type="number" id="incomeAtRetirement" class="form-input" value="75000" min="0" step="1000">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -664,15 +842,24 @@
                 <div class="form-section__content">
                     <div class="form-group">
                         <label class="form-label" for="traditionalSavings">Traditional (Tax-Deferred)</label>
-                        <input type="number" id="traditionalSavings" class="form-input" value="30000" min="0" step="1000">
+                        <div class="input-affix">
+                            <span class="input-affix__prefix">$</span>
+                            <input type="number" id="traditionalSavings" class="form-input" value="30000" min="0" step="1000">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="rothSavings">Roth (Tax-Free)</label>
-                        <input type="number" id="rothSavings" class="form-input" value="15000" min="0" step="1000">
+                        <div class="input-affix">
+                            <span class="input-affix__prefix">$</span>
+                            <input type="number" id="rothSavings" class="form-input" value="15000" min="0" step="1000">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="taxableSavings">Taxable Brokerage</label>
-                        <input type="number" id="taxableSavings" class="form-input" value="5000" min="0" step="1000">
+                        <div class="input-affix">
+                            <span class="input-affix__prefix">$</span>
+                            <input type="number" id="taxableSavings" class="form-input" value="5000" min="0" step="1000">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -696,12 +883,25 @@
                                 <button type="button" class="toggle-btn" data-target="traditionalContribution" data-type="percent">%</button>
                             </div>
                         </div>
-                        <input type="number" id="traditionalContribution" class="form-input" value="500" min="0" step="50" data-mode="dollar">
+                        <div class="contribution-inputs">
+                            <div class="input-affix">
+                                <span class="input-affix__prefix">$</span>
+                                <input type="number" id="traditionalContribution" class="form-input" value="500" min="0" step="50" data-mode="dollar" aria-label="Traditional contribution">
+                                <span class="input-affix__suffix" data-suffix-for="traditionalContribution">/mo</span>
+                            </div>
+                            <div class="input-affix contribution-increase" title="How much this monthly amount increases each year">
+                                <input type="number" id="traditionalIncrease" class="form-input" value="0" min="0" max="20" step="0.5" aria-label="Traditional contribution annual increase (%)">
+                                <span class="input-affix__suffix">%/yr<span class="suffix-long"> increase</span></span>
+                            </div>
+                        </div>
                         <div class="match-row">
                             <input type="checkbox" id="traditionalMatchEnabled">
                             <label for="traditionalMatchEnabled">Employer match</label>
-                            <input type="number" id="traditionalMatchPercent" class="form-input match-input" value="3" min="0" max="100" step="0.5" disabled>
-                            <span>% of income</span>
+                            <div class="input-affix match-input">
+                                <input type="number" id="traditionalMatchPercent" class="form-input" value="3" min="0" max="100" step="0.5" disabled>
+                                <span class="input-affix__suffix">%</span>
+                            </div>
+                            <span>of income</span>
                         </div>
                     </div>
 
@@ -714,12 +914,25 @@
                                 <button type="button" class="toggle-btn" data-target="rothContribution" data-type="percent">%</button>
                             </div>
                         </div>
-                        <input type="number" id="rothContribution" class="form-input" value="300" min="0" step="50" data-mode="dollar">
+                        <div class="contribution-inputs">
+                            <div class="input-affix">
+                                <span class="input-affix__prefix">$</span>
+                                <input type="number" id="rothContribution" class="form-input" value="300" min="0" step="50" data-mode="dollar" aria-label="Roth contribution">
+                                <span class="input-affix__suffix" data-suffix-for="rothContribution">/mo</span>
+                            </div>
+                            <div class="input-affix contribution-increase" title="How much this monthly amount increases each year">
+                                <input type="number" id="rothIncrease" class="form-input" value="0" min="0" max="20" step="0.5" aria-label="Roth contribution annual increase (%)">
+                                <span class="input-affix__suffix">%/yr<span class="suffix-long"> increase</span></span>
+                            </div>
+                        </div>
                         <div class="match-row">
                             <input type="checkbox" id="rothMatchEnabled">
                             <label for="rothMatchEnabled">Employer match</label>
-                            <input type="number" id="rothMatchPercent" class="form-input match-input" value="0" min="0" max="100" step="0.5" disabled>
-                            <span>% of income</span>
+                            <div class="input-affix match-input">
+                                <input type="number" id="rothMatchPercent" class="form-input" value="0" min="0" max="100" step="0.5" disabled>
+                                <span class="input-affix__suffix">%</span>
+                            </div>
+                            <span>of income</span>
                         </div>
                     </div>
 
@@ -732,7 +945,17 @@
                                 <button type="button" class="toggle-btn" data-target="taxableContribution" data-type="percent">%</button>
                             </div>
                         </div>
-                        <input type="number" id="taxableContribution" class="form-input" value="200" min="0" step="50" data-mode="dollar">
+                        <div class="contribution-inputs">
+                            <div class="input-affix">
+                                <span class="input-affix__prefix">$</span>
+                                <input type="number" id="taxableContribution" class="form-input" value="200" min="0" step="50" data-mode="dollar" aria-label="Taxable contribution">
+                                <span class="input-affix__suffix" data-suffix-for="taxableContribution">/mo</span>
+                            </div>
+                            <div class="input-affix contribution-increase" title="How much this monthly amount increases each year">
+                                <input type="number" id="taxableIncrease" class="form-input" value="0" min="0" max="20" step="0.5" aria-label="Taxable contribution annual increase (%)">
+                                <span class="input-affix__suffix">%/yr<span class="suffix-long"> increase</span></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -756,7 +979,10 @@
                                 <button type="button" class="toggle-btn" data-ss-mode="manual">Manual</button>
                             </div>
                         </div>
-                        <input type="number" id="ssMonthlyBenefit" class="form-input" value="2000" min="0" step="50" readonly>
+                        <div class="input-affix">
+                            <span class="input-affix__prefix">$</span>
+                            <input type="number" id="ssMonthlyBenefit" class="form-input" value="2000" min="0" step="50" readonly>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="ssStartAge">Start Age (62–70)</label>
@@ -787,22 +1013,31 @@
                 <div class="form-section__content">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" for="preRetirementReturn">Return (Pre-Retire) %</label>
-                            <input type="number" id="preRetirementReturn" class="form-input" value="7" min="0" max="30" step="0.1">
+                            <label class="form-label" for="preRetirementReturn">Return (Pre-Retire)</label>
+                            <div class="input-affix">
+                                <input type="number" id="preRetirementReturn" class="form-input" value="7" min="0" max="30" step="0.1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="postRetirementReturn">Return (Post-Retire) %</label>
-                            <input type="number" id="postRetirementReturn" class="form-input" value="5" min="0" max="30" step="0.1">
+                            <label class="form-label" for="postRetirementReturn">Return (Post-Retire)</label>
+                            <div class="input-affix">
+                                <input type="number" id="postRetirementReturn" class="form-input" value="5" min="0" max="30" step="0.1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" for="inflationRate">Inflation Rate (%)</label>
-                            <input type="number" id="inflationRate" class="form-input" value="2.5" min="0" max="20" step="0.1">
+                            <label class="form-label" for="inflationRate">Inflation Rate</label>
+                            <div class="input-affix">
+                                <input type="number" id="inflationRate" class="form-input" value="2.5" min="0" max="20" step="0.1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
                         </div>
                         <div class="form-group">
                             <div class="label-row">
-                                <label class="form-label" for="realWageGrowth">Real Wage Growth (%)</label>
+                                <label class="form-label" for="realWageGrowth">Real Wage Growth</label>
                                 <span class="info-tip info-tip--right" tabindex="0" aria-describedby="realWageTip">i
                                     <span class="info-tip__text" role="tooltip" id="realWageTip">
                                         <p>How much faster national average wages grow than inflation. Only used for the Social Security estimate. Your earnings record and the benefit formula are indexed to national wages until you turn 60, so faster wage growth means a higher starting benefit.</p>
@@ -810,30 +1045,57 @@
                                     </span>
                                 </span>
                             </div>
-                            <input type="number" id="realWageGrowth" class="form-input" value="0" min="-5" max="5" step="0.1">
+                            <div class="input-affix">
+                                <input type="number" id="realWageGrowth" class="form-input" value="0" min="-5" max="5" step="0.1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" for="currentTaxRate">Current Tax Rate (%)</label>
-                            <input type="number" id="currentTaxRate" class="form-input" value="24" min="0" max="60" step="1">
+                            <div class="label-row">
+                                <label class="form-label" for="capitalGainsRate">Capital Gains Tax</label>
+                                <span class="info-tip" tabindex="0" aria-describedby="capitalGainsTip">i
+                                    <span class="info-tip__text" role="tooltip" id="capitalGainsTip">
+                                        <p>Tax on the gains portion of withdrawals from your taxable brokerage account. 15% is the federal long-term rate for most households (0% at lower incomes, 20% at high incomes), plus any state tax.</p>
+                                        <p>Assumes your current taxable balance has no gains yet, so only future growth is taxed. Taxes on dividends while you're invested aren't modeled.</p>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="input-affix">
+                                <input type="number" id="capitalGainsRate" class="form-input" value="15" min="0" max="40" step="1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="retirementTaxRate">Retirement Tax Rate (%)</label>
-                            <input type="number" id="retirementTaxRate" class="form-input" value="20" min="0" max="60" step="1">
+                            <label class="form-label" for="retirementTaxRate">Retirement Tax Rate</label>
+                            <div class="input-affix">
+                                <input type="number" id="retirementTaxRate" class="form-input" value="20" min="0" max="60" step="1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Desired Retirement Income -->
-            <div class="form-group">
-                <label class="form-label" for="desiredIncome">Desired Annual Retirement Income (Today's $)</label>
-                <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000">
+            <div>
+                <div class="contribution-header">
+                    <label class="form-label" for="desiredIncome">Desired Retirement Income (Today's $)</label>
+                    <div class="contribution-toggle">
+                        <button type="button" class="toggle-btn" data-income-period="monthly">Monthly</button>
+                        <button type="button" class="toggle-btn active" data-income-period="yearly">Yearly</button>
+                    </div>
+                </div>
+                <div class="input-affix">
+                    <span class="input-affix__prefix">$</span>
+                    <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000" data-period="yearly">
+                    <span class="input-affix__suffix" id="desiredIncomeSuffix">/yr</span>
+                </div>
             </div>
 
             <div class="results">
-                <div class="results-title">Your Results</div>
+                <div class="results-title">Your Results <span id="resultsDollars">(Future $)</span></div>
 
                 <div class="result-item">
                     <span class="result-label">Years until retirement</span>
@@ -846,18 +1108,13 @@
                 </div>
 
                 <div class="result-item">
-                    <span class="result-label">Social Security (today's $)</span>
+                    <span class="result-label">Social Security</span>
                     <span class="result-value" id="ssResult">—</span>
                 </div>
 
                 <div class="result-item">
-                    <span class="result-label">Savings needed (4% rule)</span>
+                    <span class="result-label">Savings needed at retirement</span>
                     <span class="result-value" id="savingsNeeded">—</span>
-                </div>
-
-                <div class="result-item">
-                    <span class="result-label">Monthly income from savings</span>
-                    <span class="result-value" id="monthlyIncome">—</span>
                 </div>
 
                 <div class="result-summary">
@@ -867,13 +1124,20 @@
         </div>
 
         <div class="graph-panel">
-            <div class="graph-title">Savings Over Time</div>
+            <div class="graph-header">
+                <div class="graph-title">Savings Over Time</div>
+                <div class="contribution-toggle">
+                    <button type="button" class="toggle-btn active" data-dollars="future">Future $</button>
+                    <button type="button" class="toggle-btn" data-dollars="today">Today's $</button>
+                </div>
+            </div>
             <div class="graph-container">
                 <canvas id="graphCanvas" class="graph-canvas"></canvas>
                 <div class="graph-tooltip" id="graphTooltip">
                     <div class="tooltip-year" id="tooltipYear"></div>
                     <div class="tooltip-value" id="tooltipValue"></div>
                     <div class="tooltip-target" id="tooltipTarget"></div>
+                    <div class="tooltip-breakdown" id="tooltipBreakdown"></div>
                 </div>
             </div>
         </div>
@@ -886,6 +1150,8 @@
         let retirementAgeGlobal = 65;
         let lifeExpectancyGlobal = 100;
         let isSufficientGlobal = false;
+        let ssStartAgeGlobal = null;      // null when Social Security is off
+        let displayDollars = 'future';    // 'future' (nominal) or 'today' (inflation-adjusted)
 
         // Social Security parameters (2026 values; update yearly)
         const SS_BASE_YEAR = 2026;
@@ -905,6 +1171,8 @@
 
         // Fallback split used to find a minimum contribution when the user contributes nothing
         const DEFAULT_SPLIT = { traditional: 0.6, roth: 0.3, taxable: 0.1 };
+        const NO_ADJUST = { scale: 1, extra: 0 };
+        const ACCOUNTS = ['traditional', 'roth', 'taxable'];
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-US', {
@@ -978,6 +1246,7 @@
                 return {
                     mode: input.dataset.mode || 'dollar',  // 'dollar' = monthly $, 'percent' = % of annual income
                     value: readNumber(account + 'Contribution', 0),
+                    increase: readNumber(account + 'Increase', 0) / 100,  // yearly growth of $ contributions
                     match: matchEnabled ? readNumber(matchId + 'Percent', 0) / 100 : 0
                 };
             }
@@ -1004,8 +1273,11 @@
                 postRetirementReturn: readNumber('postRetirementReturn', 5) / 100,
                 inflationRate: readNumber('inflationRate', 2.5) / 100,
                 realWageGrowth: readNumber('realWageGrowth', 0) / 100,
+                capitalGainsRate: Math.min(0.99, readNumber('capitalGainsRate', 15) / 100),
                 retirementTaxRate: Math.min(0.99, readNumber('retirementTaxRate', 20) / 100),
-                desiredIncome: readNumber('desiredIncome', 60000),
+                // Always annual internally; the field can be entered per month
+                desiredIncome: readNumber('desiredIncome', 60000)
+                    * (document.getElementById('desiredIncome').dataset.period === 'monthly' ? 12 : 1),
                 ssEnabled,
                 ssMode,
                 ssStartAge,
@@ -1014,15 +1286,18 @@
             };
         }
 
-        // Monthly contributions per account for a year at the given annual income.
+        // Monthly contributions per account for a year at the given annual income, yearsFromNow years out.
+        // $ contributions grow by their own annual increase; % contributions follow income.
         // adjust.scale multiplies the employee's own contributions; adjust.extra adds a flat
         // monthly amount split by DEFAULT_SPLIT (both used by the minimum-contribution search).
         // Employer match is always a % of the current year's income and is never scaled.
-        function contributionsForYear(inputs, income, adjust = { scale: 1, extra: 0 }) {
+        function contributionsForYear(inputs, income, yearsFromNow, adjust = NO_ADJUST) {
             const result = {};
-            for (const account of ['traditional', 'roth', 'taxable']) {
+            for (const account of ACCOUNTS) {
                 const spec = inputs.contributions[account];
-                const employee = spec.mode === 'percent' ? income * spec.value / 100 / 12 : spec.value;
+                const employee = spec.mode === 'percent'
+                    ? income * spec.value / 100 / 12
+                    : spec.value * Math.pow(1 + spec.increase, yearsFromNow);
                 result[account] = employee * adjust.scale
                     + income * spec.match / 12
                     + adjust.extra * DEFAULT_SPLIT[account];
@@ -1036,7 +1311,7 @@
             for (const account in inputs.contributions) {
                 noMatch.contributions[account] = { ...inputs.contributions[account], match: 0 };
             }
-            const c = contributionsForYear(noMatch, inputs.currentIncome);
+            const c = contributionsForYear(noMatch, inputs.currentIncome, 0);
             return c.traditional + c.roth + c.taxable;
         }
 
@@ -1116,13 +1391,14 @@
 
         // ---- Simulation ----
 
-        // Month-by-month simulation from current age to life expectancy.
-        // Returns yearly data points and the age savings ran out (null if they never did).
-        function simulate(inputs, adjust = { scale: 1, extra: 0 }) {
+        // Month-by-month simulation from current age (or start.age, which must be at or after
+        // retirement) to life expectancy. Returns yearly data points and the age savings ran out
+        // (null if they never did).
+        function simulate(inputs, adjust = NO_ADJUST, start = null) {
             const { currentAge, retirementAge, lifeExpectancy,
                     currentIncome, incomeGrowthRate,
                     preRetirementReturn, postRetirementReturn,
-                    inflationRate, retirementTaxRate, desiredIncome,
+                    inflationRate, retirementTaxRate, capitalGainsRate, desiredIncome,
                     ssStartAge, ssCutEnabled } = inputs;
 
             const preMonthlyReturn = monthlyRate(preRetirementReturn);
@@ -1130,9 +1406,12 @@
             const ssAtStart = socialSecurityAtStart(inputs);
             const startCalendarYear = currentCalendarYear();
 
-            let traditional = inputs.traditionalSavings;
-            let roth = inputs.rothSavings;
-            let taxable = inputs.taxableSavings;
+            const firstAge = start ? start.age : currentAge;
+            let traditional = start ? start.traditional : inputs.traditionalSavings;
+            let roth = start ? start.roth : inputs.rothSavings;
+            let taxable = start ? start.taxable : inputs.taxableSavings;
+            // Cost basis of the taxable account (today's balance is assumed to have no gains yet)
+            let taxableBasis = start ? start.taxableBasis : inputs.taxableSavings;
             let income = currentIncome;
             let depletedAge = null;
 
@@ -1142,15 +1421,16 @@
                 traditional: Math.max(0, traditional),
                 roth: Math.max(0, roth),
                 taxable: Math.max(0, taxable),
+                taxableBasis: Math.max(0, taxableBasis),
                 savings: Math.max(0, traditional + roth + taxable)
             });
-            record(currentAge);
+            record(firstAge);
 
-            for (let age = currentAge; age < lifeExpectancy; age++) {
+            for (let age = firstAge; age < lifeExpectancy; age++) {
                 const yearsFromNow = age - currentAge;
                 const retired = age >= retirementAge;
                 const monthlyReturn = retired ? postMonthlyReturn : preMonthlyReturn;
-                const contrib = retired ? null : contributionsForYear(inputs, income, adjust);
+                const contrib = retired ? null : contributionsForYear(inputs, income, yearsFromNow, adjust);
                 // Desired income is in today's dollars (after tax); grow it with inflation
                 const monthlySpending = retired ? desiredIncome / 12 * Math.pow(1 + inflationRate, yearsFromNow) : 0;
                 // Social Security with annual COLAs, after income tax on the taxable portion
@@ -1170,6 +1450,7 @@
                         roth += contrib.roth;
                         // Benefits received while still working are saved
                         taxable += contrib.taxable + ssNet;
+                        taxableBasis += contrib.taxable + ssNet;
                         continue;
                     }
 
@@ -1177,14 +1458,18 @@
                     if (remaining < 0) {
                         // Social Security exceeds spending; save the surplus
                         taxable -= remaining;
+                        taxableBasis -= remaining;
                         remaining = 0;
                     }
 
-                    // Withdraw from taxable first (capital gains, typically lower tax)
+                    // Withdraw from taxable first; only the gains portion is taxed (capital gains)
                     if (remaining > 0 && taxable > 0) {
-                        const fromTaxable = Math.min(remaining, taxable);
+                        const basisShare = Math.min(1, taxableBasis / taxable);
+                        const netPerDollar = 1 - (1 - basisShare) * capitalGainsRate;
+                        const fromTaxable = Math.min(remaining / netPerDollar, taxable);
+                        taxableBasis -= fromTaxable * basisShare;
                         taxable -= fromTaxable;
-                        remaining -= fromTaxable;
+                        remaining -= fromTaxable * netPerDollar;
                     }
 
                     // Then traditional (need to gross up for income taxes)
@@ -1250,6 +1535,41 @@
             return { monthly: toMonthly(high), adjust: toAdjust(high) };
         }
 
+        // Smallest balance at retirement (split like the projected balance) that lasts to life
+        // expectancy, in future dollars. Returns null if no reasonable balance works.
+        function calculateSavingsNeeded(inputs, atRetirement) {
+            const total = atRetirement.traditional + atRetirement.roth + atRetirement.taxable;
+            const split = total > 0
+                ? { traditional: atRetirement.traditional / total, roth: atRetirement.roth / total, taxable: atRetirement.taxable / total }
+                : DEFAULT_SPLIT;
+            const basisShare = atRetirement.taxable > 0 ? Math.min(1, atRetirement.taxableBasis / atRetirement.taxable) : 1;
+            const survives = (balance) => simulate(inputs, NO_ADJUST, {
+                age: inputs.retirementAge,
+                traditional: balance * split.traditional,
+                roth: balance * split.roth,
+                taxable: balance * split.taxable,
+                taxableBasis: balance * split.taxable * basisShare
+            }).depletedAge === null;
+
+            if (survives(0)) return 0;
+            let low = 0;
+            let high = 100000;
+            while (!survives(high)) {
+                low = high;
+                high *= 2;
+                if (high > 1e11) return null;
+            }
+            for (let iter = 0; iter < 40; iter++) {
+                const mid = (low + high) / 2;
+                if (survives(mid)) {
+                    high = mid;
+                } else {
+                    low = mid;
+                }
+            }
+            return high;
+        }
+
         // Sync income fields (growth rate <-> at retirement income)
         function syncIncomeFields(changedField) {
             const currentAge = Math.round(readNumber('currentAge', 30));
@@ -1286,7 +1606,7 @@
             document.getElementById('totalSavingsSummary').textContent = formatCurrency(totalSavings);
 
             // First-year contributions including employer match
-            const c = contributionsForYear(inputs, inputs.currentIncome);
+            const c = contributionsForYear(inputs, inputs.currentIncome, 0);
             const yearlyContributions = (c.traditional + c.roth + c.taxable) * 12;
             document.getElementById('totalContributionsSummary').textContent = formatCurrency(yearlyContributions) + '/yr';
 
@@ -1330,7 +1650,7 @@
         }
 
         function showInvalid(message) {
-            ['yearsToRetirement', 'projectedSavings', 'ssResult', 'savingsNeeded', 'monthlyIncome'].forEach(id => {
+            ['yearsToRetirement', 'projectedSavings', 'ssResult', 'savingsNeeded'].forEach(id => {
                 document.getElementById(id).textContent = '—';
             });
             document.getElementById('summaryText').textContent = message;
@@ -1340,12 +1660,16 @@
         }
 
         function calculateRetirement() {
+            saveStateToUrl();
             const inputs = getInputValues();
             const ssToday = updateSummaries(inputs);
-            const { currentAge, retirementAge, lifeExpectancy, inflationRate, desiredIncome, retirementTaxRate } = inputs;
+            const { currentAge, retirementAge, lifeExpectancy, inflationRate } = inputs;
 
             retirementAgeGlobal = retirementAge;
             lifeExpectancyGlobal = lifeExpectancy;
+            ssStartAgeGlobal = inputs.ssEnabled ? inputs.ssStartAge : null;
+            const showToday = displayDollars === 'today';
+            document.getElementById('resultsDollars').textContent = showToday ? "(Today's $)" : '(Future $)';
 
             // Validate
             if (retirementAge <= currentAge) {
@@ -1362,35 +1686,41 @@
 
             // Main savings trajectory (with user's contributions)
             const result = simulate(inputs);
-            savingsData = result.data;
 
             // Minimum required contribution and its trajectory
             const min = calculateMinContribution(inputs);
-            minContributionData = min ? simulate(inputs, min.adjust).data : [];
+            const minResultData = min ? simulate(inputs, min.adjust).data : [];
 
-            const projectedSavings = savingsData[yearsToRetirement].savings;
-            const inflationFactor = Math.pow(1 + inflationRate, yearsToRetirement);
+            // Graph data in the selected dollars (today's $ removes inflation year by year)
+            const toDisplay = (data) => data.map(d => {
+                const factor = showToday ? Math.pow(1 + inflationRate, d.year - currentAge) : 1;
+                return {
+                    year: d.year,
+                    traditional: d.traditional / factor,
+                    roth: d.roth / factor,
+                    taxable: d.taxable / factor,
+                    savings: d.savings / factor
+                };
+            });
+            savingsData = toDisplay(result.data);
+            minContributionData = toDisplay(minResultData);
 
-            // Savings needed using 4% rule, net of after-tax Social Security (future dollars).
-            // Approximate: ignores any gap years if benefits start after retirement.
-            let ssAnnualNetToday = inputs.ssEnabled
-                ? ssToday.scheduledToday * 12 * (1 - SS_TAXABLE_PORTION * retirementTaxRate) : 0;
-            if (inputs.ssCutEnabled) {
-                const firstYearReceived = Math.max(yearsToRetirement, inputs.ssStartAge - currentAge);
-                ssAnnualNetToday *= ssPayableRatio(currentCalendarYear() + firstYearReceived);
-            }
-            const savingsNeeded = Math.max(0, desiredIncome - ssAnnualNetToday) * inflationFactor * 25;
-
-            // Monthly income from projected savings (4% rule, future dollars)
-            const monthlyIncomeFromSavings = projectedSavings * 0.04 / 12;
+            const atRetirement = result.data[yearsToRetirement];
+            const projectedSavings = atRetirement.savings;
+            const savingsNeeded = calculateSavingsNeeded(inputs, atRetirement);
+            // Results are computed in future dollars; convert at the retirement year if needed
+            const display = (amount) => showToday ? toTodaysDollars(amount, retirementAge, inputs) : amount;
+            // First Social Security payment, in future dollars of the year it starts if selected
+            const ssFirstPayment = showToday ? ssToday.firstPaymentToday
+                : ssToday.firstPaymentToday * Math.pow(1 + inflationRate, Math.max(0, inputs.ssStartAge - currentAge));
 
             // Update DOM
             document.getElementById('yearsToRetirement').textContent = yearsToRetirement + ' years';
-            document.getElementById('projectedSavings').textContent = formatCurrency(projectedSavings);
+            document.getElementById('projectedSavings').textContent = formatCurrency(display(projectedSavings));
             document.getElementById('ssResult').textContent = inputs.ssEnabled
-                ? formatCurrency(ssToday.firstPaymentToday) + '/mo at ' + inputs.ssStartAge : 'Off';
-            document.getElementById('savingsNeeded').textContent = formatCurrency(savingsNeeded);
-            document.getElementById('monthlyIncome').textContent = formatCurrency(monthlyIncomeFromSavings);
+                ? formatCurrency(ssFirstPayment) + '/mo at ' + inputs.ssStartAge : 'Off';
+            document.getElementById('savingsNeeded').textContent = savingsNeeded === null
+                ? 'Out of reach' : formatCurrency(display(savingsNeeded));
 
             const projectedElement = document.getElementById('projectedSavings');
             const summaryElement = document.getElementById('summaryText');
@@ -1504,23 +1834,41 @@
 
             ctx.setLineDash([]);
 
-            // Draw retirement age vertical line
-            if (retirementAgeGlobal > minYear && retirementAgeGlobal < maxYear) {
+            // Vertical markers for retirement and the start of Social Security
+            const markers = [{ age: retirementAgeGlobal, label: 'Retirement' }];
+            if (ssStartAgeGlobal === retirementAgeGlobal) {
+                markers[0].label = 'Retirement & Social Security';
+            } else if (ssStartAgeGlobal !== null) {
+                markers.push({ age: ssStartAgeGlobal, label: 'Social Security' });
+            }
+            const visibleMarkers = markers
+                .filter(m => m.age > minYear && m.age < maxYear)
+                .sort((a, b) => a.age - b.age);
+            // Push labels apart when the two lines are close together
+            const labelsCrowded = visibleMarkers.length === 2
+                && xScale(visibleMarkers[1].age) - xScale(visibleMarkers[0].age) < 90;
+
+            ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
+            visibleMarkers.forEach((marker, i) => {
+                const x = xScale(marker.age);
                 ctx.strokeStyle = gridColor;
                 ctx.lineWidth = 1;
                 ctx.setLineDash([6, 4]);
                 ctx.beginPath();
-                ctx.moveTo(xScale(retirementAgeGlobal), padding.top);
-                ctx.lineTo(xScale(retirementAgeGlobal), height - padding.bottom);
+                ctx.moveTo(x, padding.top);
+                ctx.lineTo(x, height - padding.bottom);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Label for retirement
                 ctx.fillStyle = textColor;
-                ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('Retirement', xScale(retirementAgeGlobal), padding.top - 8);
-            }
+                if (labelsCrowded) {
+                    ctx.textAlign = i === 0 ? 'right' : 'left';
+                    ctx.fillText(marker.label, i === 0 ? x - 4 : x + 4, padding.top - 8);
+                } else {
+                    ctx.textAlign = 'center';
+                    ctx.fillText(marker.label, x, padding.top - 8);
+                }
+            });
 
             // Draw X-axis labels
             const yearStep = Math.ceil((maxYear - minYear) / 7);
@@ -1672,13 +2020,22 @@
                 document.getElementById('tooltipTarget').textContent = '';
             }
 
+            document.getElementById('tooltipBreakdown').innerHTML =
+                'Traditional: ' + formatCurrency(dataPoint.traditional) + '<br>'
+                + 'Roth: ' + formatCurrency(dataPoint.roth) + '<br>'
+                + 'Taxable: ' + formatCurrency(dataPoint.taxable);
+
             // Position tooltip
+            const tooltipWidth = tooltip.offsetWidth;
             let tooltipX = pointX + 15;
             let tooltipY = pointY - 40;
 
             // Keep tooltip in bounds
-            if (tooltipX + 180 > rect.width) {
-                tooltipX = pointX - 190;
+            if (tooltipX + tooltipWidth > rect.width) {
+                tooltipX = pointX - tooltipWidth - 15;
+            }
+            if (tooltipY + tooltip.offsetHeight > rect.height) {
+                tooltipY = rect.height - tooltip.offsetHeight;
             }
             if (tooltipY < 0) {
                 tooltipY = pointY + 15;
@@ -1691,6 +2048,113 @@
 
         function handleMouseLeave() {
             document.getElementById('graphTooltip').classList.remove('visible');
+        }
+
+        // ---- UI modes ----
+
+        // Switch an account's contribution between monthly $ and % of income (no value conversion)
+        function setContributionMode(account, mode) {
+            const input = document.getElementById(account + 'Contribution');
+            input.dataset.mode = mode;
+            input.step = mode === 'percent' ? '0.5' : '50';
+            input.closest('.contribution-item').classList.toggle('is-percent', mode === 'percent');
+            document.querySelector(`[data-suffix-for="${account}Contribution"]`).textContent =
+                mode === 'percent' ? '% of income' : '/mo';
+            document.querySelectorAll(`.toggle-btn[data-target="${account}Contribution"]`).forEach(b => {
+                b.classList.toggle('active', b.dataset.type === mode);
+            });
+        }
+
+        function setSsMode(mode) {
+            document.querySelectorAll('[data-ss-mode]').forEach(b => b.classList.toggle('active', b.dataset.ssMode === mode));
+            document.getElementById('ssMonthlyBenefit').readOnly = mode === 'estimate';
+        }
+
+        function setIncomePeriod(period) {
+            const input = document.getElementById('desiredIncome');
+            input.dataset.period = period;
+            input.step = period === 'monthly' ? '100' : '1000';
+            document.getElementById('desiredIncomeSuffix').textContent = period === 'monthly' ? '/mo' : '/yr';
+            document.querySelectorAll('[data-income-period]').forEach(b => {
+                b.classList.toggle('active', b.dataset.incomePeriod === period);
+            });
+        }
+
+        function setDisplayDollars(mode) {
+            displayDollars = mode;
+            document.querySelectorAll('[data-dollars]').forEach(b => b.classList.toggle('active', b.dataset.dollars === mode));
+        }
+
+        // ---- Inputs saved in the URL (after #, so they never reach the server) ----
+
+        const STATE_FIELDS = [
+            'currentAge', 'retirementAge', 'lifeExpectancy', 'currentIncome', 'incomeGrowthRate',
+            'traditionalSavings', 'rothSavings', 'taxableSavings',
+            'traditionalContribution', 'rothContribution', 'taxableContribution',
+            'traditionalIncrease', 'rothIncrease', 'taxableIncrease',
+            'traditionalMatchPercent', 'rothMatchPercent', 'ssStartAge',
+            'preRetirementReturn', 'postRetirementReturn', 'inflationRate', 'realWageGrowth',
+            'capitalGainsRate', 'retirementTaxRate', 'desiredIncome'
+        ];
+        const STATE_CHECKBOXES = ['traditionalMatchEnabled', 'rothMatchEnabled', 'ssEnabled', 'ssCutEnabled'];
+        let defaultState = null;
+
+        function readState() {
+            const state = {};
+            STATE_FIELDS.forEach(id => { state[id] = document.getElementById(id).value; });
+            STATE_CHECKBOXES.forEach(id => { state[id] = document.getElementById(id).checked ? '1' : '0'; });
+            ACCOUNTS.forEach(account => {
+                state[account + 'Mode'] = document.getElementById(account + 'Contribution').dataset.mode;
+            });
+            state.ssMode = document.querySelector('[data-ss-mode].active').dataset.ssMode;
+            // The benefit field is only an input in manual mode
+            state.ssMonthlyBenefit = state.ssMode === 'manual' ? document.getElementById('ssMonthlyBenefit').value : '';
+            state.dollars = displayDollars;
+            state.incomePeriod = document.getElementById('desiredIncome').dataset.period;
+            return state;
+        }
+
+        function saveStateToUrl() {
+            if (!defaultState) return;
+            const state = readState();
+            const params = new URLSearchParams();
+            for (const key in state) {
+                if (state[key] !== defaultState[key]) params.set(key, state[key]);
+            }
+            const hash = params.toString();
+            try {
+                history.replaceState(null, '', hash ? '#' + hash : location.pathname + location.search);
+            } catch (e) {
+                // Some contexts (e.g. sandboxed previews) don't allow URL changes
+            }
+        }
+
+        function loadStateFromUrl() {
+            const params = new URLSearchParams(location.hash.slice(1));
+            ACCOUNTS.forEach(account => {
+                const mode = params.get(account + 'Mode');
+                if (mode === 'dollar' || mode === 'percent') setContributionMode(account, mode);
+            });
+            const ssMode = params.get('ssMode');
+            if (ssMode === 'estimate' || ssMode === 'manual') setSsMode(ssMode);
+            const incomePeriod = params.get('incomePeriod');
+            if (incomePeriod === 'monthly' || incomePeriod === 'yearly') setIncomePeriod(incomePeriod);
+            const dollars = params.get('dollars');
+            if (dollars === 'future' || dollars === 'today') setDisplayDollars(dollars);
+
+            STATE_FIELDS.concat('ssMonthlyBenefit').forEach(id => {
+                const value = params.get(id);
+                if (value !== null && value !== '' && Number.isFinite(parseFloat(value))) {
+                    document.getElementById(id).value = value;
+                }
+            });
+            STATE_CHECKBOXES.forEach(id => {
+                const value = params.get(id);
+                if (value === '1' || value === '0') document.getElementById(id).checked = value === '1';
+            });
+            ['traditional', 'roth'].forEach(account => {
+                document.getElementById(account + 'MatchPercent').disabled = !document.getElementById(account + 'MatchEnabled').checked;
+            });
         }
 
         // Event listeners for all form inputs
@@ -1717,17 +2181,12 @@
             // Toggle buttons for contribution mode ($ vs %)
             const toggleButtons = document.querySelectorAll('.toggle-btn[data-target]');
             toggleButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', () => {
                     const targetId = btn.dataset.target;
                     const newMode = btn.dataset.type;
                     const input = document.getElementById(targetId);
                     const currentIncome = readNumber('currentIncome', 75000) || 1;
                     const currentValue = parseFloat(input.value) || 0;
-
-                    // Update active state
-                    const container = btn.closest('.contribution-toggle');
-                    container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
 
                     // Convert value if switching modes
                     const oldMode = input.dataset.mode || 'dollar';
@@ -1735,18 +2194,14 @@
                         if (newMode === 'percent') {
                             // Convert monthly $ to % of annual income
                             const annualContrib = currentValue * 12;
-                            const percent = (annualContrib / currentIncome) * 100;
-                            input.value = percent.toFixed(1);
-                            input.step = '0.5';
+                            input.value = ((annualContrib / currentIncome) * 100).toFixed(1);
                         } else {
                             // Convert % to monthly $
-                            const monthlyAmount = (currentIncome * (currentValue / 100)) / 12;
-                            input.value = Math.round(monthlyAmount);
-                            input.step = '50';
+                            input.value = Math.round((currentIncome * (currentValue / 100)) / 12);
                         }
-                        input.dataset.mode = newMode;
                     }
 
+                    setContributionMode(targetId.replace('Contribution', ''), newMode);
                     calculateRetirement();
                 });
             });
@@ -1776,11 +2231,59 @@
                     if (wasEstimate && btn.dataset.ssMode === 'manual') {
                         benefitInput.value = Math.round(scheduledEstimateToday(getInputValues()));
                     }
-                    document.querySelectorAll('[data-ss-mode]').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    benefitInput.readOnly = btn.dataset.ssMode === 'estimate';
+                    setSsMode(btn.dataset.ssMode);
                     calculateRetirement();
                 });
+            });
+
+            // Desired income entered per month or per year (converts the value)
+            document.querySelectorAll('[data-income-period]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const input = document.getElementById('desiredIncome');
+                    const period = btn.dataset.incomePeriod;
+                    if (input.dataset.period !== period) {
+                        const value = parseFloat(input.value) || 0;
+                        input.value = Math.round(period === 'monthly' ? value / 12 : value * 12);
+                    }
+                    setIncomePeriod(period);
+                    calculateRetirement();
+                });
+            });
+
+            // Future vs today's dollars for the graph and results
+            document.querySelectorAll('[data-dollars]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setDisplayDollars(btn.dataset.dollars);
+                    calculateRetirement();
+                });
+            });
+
+            // Copy a link that includes the current inputs
+            const copyButton = document.getElementById('copyLinkButton');
+            const copyIcon = copyButton.innerHTML;
+            copyButton.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(location.href);
+                    copyButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+                        + 'stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                    copyButton.title = 'Link copied';
+                    setTimeout(() => {
+                        copyButton.innerHTML = copyIcon;
+                        copyButton.title = 'Copy a link to this calculation';
+                    }, 1500);
+                } catch (e) {
+                    window.prompt('Copy this link:', location.href);
+                }
+            });
+
+            // Reset everything to the defaults
+            document.getElementById('resetButton').addEventListener('click', () => {
+                try {
+                    history.replaceState(null, '', location.pathname + location.search);
+                } catch (e) {
+                    // ignore; reload below still resets inputs without a hash
+                }
+                location.reload();
             });
         }
 
@@ -1791,12 +2294,15 @@
         // Redraw whenever the graph area changes size
         let resizeTimeout;
         new ResizeObserver(() => {
+            handleMouseLeave();
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(drawGraph, 100);
         }).observe(canvas.parentElement);
 
         // Initialize
         initializeEventListeners();
+        defaultState = readState();
+        loadStateFromUrl();
         syncIncomeFields('growthRate'); // Set initial income at retirement value
         calculateRetirement();
     </script>
