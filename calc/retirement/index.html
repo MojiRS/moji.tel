@@ -37,6 +37,8 @@
             --graph-fill-error: rgba(248, 113, 113, 0.2);
             --graph-line-min: #888;
             --graph-fill-min: rgba(136, 136, 136, 0.08);
+            --graph-band-fill: rgba(138, 124, 184, 0.22);
+            --graph-band-line: rgba(138, 124, 184, 0.7);
         }
 
         @media (prefers-color-scheme: light) {
@@ -63,6 +65,8 @@
                 --graph-fill-error: rgba(239, 68, 68, 0.15);
                 --graph-line-min: #999;
                 --graph-fill-min: rgba(153, 153, 153, 0.08);
+                --graph-band-fill: rgba(107, 91, 149, 0.16);
+                --graph-band-line: rgba(107, 91, 149, 0.6);
             }
         }
 
@@ -172,6 +176,27 @@
             font-size: 16px;
             font-family: inherit;
             transition: all 0.25s ease;
+        }
+
+        /* Hide number spinners unless hovered; they otherwise cover digits in narrow fields */
+        .form-input[type="number"] {
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+
+        .form-input[type="number"]::-webkit-inner-spin-button,
+        .form-input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .form-input[type="number"]:hover {
+            appearance: auto;
+            -moz-appearance: auto;
+        }
+
+        .form-input[type="number"]:hover::-webkit-inner-spin-button {
+            -webkit-appearance: inner-spin-button;
         }
 
         .form-input:focus {
@@ -453,6 +478,68 @@
 
         .contribution-item.is-percent .contribution-increase {
             display: none;
+        }
+
+        .input-with-toggle {
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .contribution-toggle--vertical {
+            flex-direction: column;
+        }
+
+        .contribution-toggle--vertical .toggle-btn {
+            flex: 1;
+        }
+
+        .input-with-toggle > .input-affix {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .form-row--stacked {
+            grid-template-columns: 1fr;
+        }
+
+        /* [value] ± [range] for assumptions with a margin of error */
+        .range-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .range-row > .input-affix {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .range-row .input-affix__prefix {
+            padding-left: 12px;
+        }
+
+        .range-row .input-affix__suffix {
+            padding-right: 12px;
+        }
+
+        .range-row .form-input,
+        .range-row .form-input:focus {
+            padding-left: 12px;
+        }
+
+        .range-row .input-affix__prefix + .form-input {
+            padding-left: 4px;
+        }
+
+        .range-row .input-affix .form-input:last-child {
+            padding-right: 12px;
+        }
+
+        .range-sep {
+            flex-shrink: 0;
+            font-size: 16px;
+            color: var(--text-muted);
         }
 
         /* Input with a unit suffix inside the box */
@@ -743,8 +830,13 @@
 
             /* Anchor tooltips to their whole row so they can't run off-screen */
             .label-row,
-            .match-row {
+            .match-row,
+            .result-item {
                 position: relative;
+            }
+
+            .result-item .label-row {
+                position: static;
             }
 
             .info-tip {
@@ -801,29 +893,43 @@
             <!-- Income Section (collapsed by default) -->
             <div class="form-section collapsed" id="incomeSection">
                 <div class="form-section__header" onclick="toggleSection(this)">
-                    <span class="form-section__title">Income</span>
+                    <span class="form-section__title">Income (Pre-Tax)</span>
                     <div class="input-affix form-section__header-input" onclick="event.stopPropagation()">
                         <span class="input-affix__prefix">$</span>
-                        <input type="number" id="currentIncome" class="form-input" value="75000" min="0" step="1000">
+                        <input type="number" id="currentIncome" class="form-input" value="60000" min="0" step="1000">
                     </div>
                     <svg class="form-section__toggle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
                 <div class="form-section__content">
-                    <div class="form-row">
+                    <div class="form-row form-row--stacked">
                         <div class="form-group">
                             <label class="form-label" for="incomeGrowthRate">Annual Increase</label>
-                            <div class="input-affix">
-                                <input type="number" id="incomeGrowthRate" class="form-input" value="3" min="0" max="20" step="0.1">
-                                <span class="input-affix__suffix">%</span>
+                            <div class="range-row">
+                                <div class="input-affix">
+                                    <input type="number" id="incomeGrowthRate" class="form-input" value="4" min="0" max="20" step="0.1">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
+                                <span class="range-sep" aria-hidden="true">±</span>
+                                <div class="input-affix">
+                                    <input type="number" id="incomeGrowthRange" class="form-input" value="1" min="0" max="10" step="0.1" aria-label="Annual increase range (plus or minus %)">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="incomeAtRetirement">At Retirement (Today's $)</label>
-                            <div class="input-affix">
-                                <span class="input-affix__prefix">$</span>
-                                <input type="number" id="incomeAtRetirement" class="form-input" value="75000" min="0" step="1000">
+                            <div class="range-row">
+                                <div class="input-affix">
+                                    <span class="input-affix__prefix">$</span>
+                                    <input type="number" id="incomeAtRetirement" class="form-input" value="99628" min="0" step="1000">
+                                </div>
+                                <span class="range-sep" aria-hidden="true">±</span>
+                                <div class="input-affix">
+                                    <span class="input-affix__prefix">$</span>
+                                    <input type="number" id="incomeAtRetirementRange" class="form-input" value="0" min="0" step="1000" aria-label="Income at retirement range (plus or minus $)">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -844,21 +950,21 @@
                         <label class="form-label" for="traditionalSavings">Traditional (Tax-Deferred)</label>
                         <div class="input-affix">
                             <span class="input-affix__prefix">$</span>
-                            <input type="number" id="traditionalSavings" class="form-input" value="30000" min="0" step="1000">
+                            <input type="number" id="traditionalSavings" class="form-input" value="19000" min="0" step="1000">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="rothSavings">Roth (Tax-Free)</label>
                         <div class="input-affix">
                             <span class="input-affix__prefix">$</span>
-                            <input type="number" id="rothSavings" class="form-input" value="15000" min="0" step="1000">
+                            <input type="number" id="rothSavings" class="form-input" value="0" min="0" step="1000">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="taxableSavings">Taxable Brokerage</label>
                         <div class="input-affix">
                             <span class="input-affix__prefix">$</span>
-                            <input type="number" id="taxableSavings" class="form-input" value="5000" min="0" step="1000">
+                            <input type="number" id="taxableSavings" class="form-input" value="0" min="0" step="1000">
                         </div>
                     </div>
                 </div>
@@ -875,19 +981,19 @@
                 </div>
                 <div class="form-section__content">
                     <!-- Traditional contribution -->
-                    <div class="contribution-item">
+                    <div class="contribution-item is-percent">
                         <div class="contribution-header">
                             <label class="form-label">Traditional (Tax-Deferred)</label>
                             <div class="contribution-toggle">
-                                <button type="button" class="toggle-btn active" data-target="traditionalContribution" data-type="dollar">$</button>
-                                <button type="button" class="toggle-btn" data-target="traditionalContribution" data-type="percent">%</button>
+                                <button type="button" class="toggle-btn" data-target="traditionalContribution" data-type="dollar">$</button>
+                                <button type="button" class="toggle-btn active" data-target="traditionalContribution" data-type="percent">%</button>
                             </div>
                         </div>
                         <div class="contribution-inputs">
                             <div class="input-affix">
                                 <span class="input-affix__prefix">$</span>
-                                <input type="number" id="traditionalContribution" class="form-input" value="500" min="0" step="50" data-mode="dollar" aria-label="Traditional contribution">
-                                <span class="input-affix__suffix" data-suffix-for="traditionalContribution">/mo</span>
+                                <input type="number" id="traditionalContribution" class="form-input" value="6.5" min="0" step="0.5" data-mode="percent" aria-label="Traditional contribution">
+                                <span class="input-affix__suffix" data-suffix-for="traditionalContribution">% of income</span>
                             </div>
                             <div class="input-affix contribution-increase" title="How much this monthly amount increases each year">
                                 <input type="number" id="traditionalIncrease" class="form-input" value="0" min="0" max="20" step="0.5" aria-label="Traditional contribution annual increase (%)">
@@ -895,10 +1001,10 @@
                             </div>
                         </div>
                         <div class="match-row">
-                            <input type="checkbox" id="traditionalMatchEnabled">
+                            <input type="checkbox" id="traditionalMatchEnabled" checked>
                             <label for="traditionalMatchEnabled">Employer match</label>
                             <div class="input-affix match-input">
-                                <input type="number" id="traditionalMatchPercent" class="form-input" value="3" min="0" max="100" step="0.5" disabled>
+                                <input type="number" id="traditionalMatchPercent" class="form-input" value="4" min="0" max="100" step="0.5">
                                 <span class="input-affix__suffix">%</span>
                             </div>
                             <span>of income</span>
@@ -917,7 +1023,7 @@
                         <div class="contribution-inputs">
                             <div class="input-affix">
                                 <span class="input-affix__prefix">$</span>
-                                <input type="number" id="rothContribution" class="form-input" value="300" min="0" step="50" data-mode="dollar" aria-label="Roth contribution">
+                                <input type="number" id="rothContribution" class="form-input" value="0" min="0" step="50" data-mode="dollar" aria-label="Roth contribution">
                                 <span class="input-affix__suffix" data-suffix-for="rothContribution">/mo</span>
                             </div>
                             <div class="input-affix contribution-increase" title="How much this monthly amount increases each year">
@@ -948,7 +1054,7 @@
                         <div class="contribution-inputs">
                             <div class="input-affix">
                                 <span class="input-affix__prefix">$</span>
-                                <input type="number" id="taxableContribution" class="form-input" value="200" min="0" step="50" data-mode="dollar" aria-label="Taxable contribution">
+                                <input type="number" id="taxableContribution" class="form-input" value="0" min="0" step="50" data-mode="dollar" aria-label="Taxable contribution">
                                 <span class="input-affix__suffix" data-suffix-for="taxableContribution">/mo</span>
                             </div>
                             <div class="input-affix contribution-increase" title="How much this monthly amount increases each year">
@@ -1014,25 +1120,46 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="preRetirementReturn">Return (Pre-Retire)</label>
-                            <div class="input-affix">
-                                <input type="number" id="preRetirementReturn" class="form-input" value="7" min="0" max="30" step="0.1">
-                                <span class="input-affix__suffix">%</span>
+                            <div class="range-row">
+                                <div class="input-affix">
+                                    <input type="number" id="preRetirementReturn" class="form-input" value="7" min="0" max="30" step="0.1">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
+                                <span class="range-sep" aria-hidden="true">±</span>
+                                <div class="input-affix">
+                                    <input type="number" id="preReturnRange" class="form-input" value="1.5" min="0" max="10" step="0.1" aria-label="Pre-retirement return range (plus or minus %)">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="postRetirementReturn">Return (Post-Retire)</label>
-                            <div class="input-affix">
-                                <input type="number" id="postRetirementReturn" class="form-input" value="5" min="0" max="30" step="0.1">
-                                <span class="input-affix__suffix">%</span>
+                            <div class="range-row">
+                                <div class="input-affix">
+                                    <input type="number" id="postRetirementReturn" class="form-input" value="5.5" min="0" max="30" step="0.1">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
+                                <span class="range-sep" aria-hidden="true">±</span>
+                                <div class="input-affix">
+                                    <input type="number" id="postReturnRange" class="form-input" value="1" min="0" max="10" step="0.1" aria-label="Post-retirement return range (plus or minus %)">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" for="inflationRate">Inflation Rate</label>
-                            <div class="input-affix">
-                                <input type="number" id="inflationRate" class="form-input" value="2.5" min="0" max="20" step="0.1">
-                                <span class="input-affix__suffix">%</span>
+                            <div class="range-row">
+                                <div class="input-affix">
+                                    <input type="number" id="inflationRate" class="form-input" value="2.5" min="0" max="20" step="0.1">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
+                                <span class="range-sep" aria-hidden="true">±</span>
+                                <div class="input-affix">
+                                    <input type="number" id="inflationRange" class="form-input" value="0.75" min="0" max="10" step="0.1" aria-label="Inflation range (plus or minus %)">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -1041,13 +1168,20 @@
                                 <span class="info-tip info-tip--right" tabindex="0" aria-describedby="realWageTip">i
                                     <span class="info-tip__text" role="tooltip" id="realWageTip">
                                         <p>How much faster national average wages grow than inflation. Only used for the Social Security estimate. Your earnings record and the benefit formula are indexed to national wages until you turn 60, so faster wage growth means a higher starting benefit.</p>
-                                        <p>The default of 0% matches the "today's dollars" estimate on your SSA statement and is the conservative choice. The Social Security Trustees project about 1.1%/yr long-term. Actual growth averaged about 0.8%/yr from 1969 to 2019.</p>
+                                        <p>The default of 1% sits between the Social Security Trustees' long-term projection (about 1.1%/yr) and the actual 1969–2019 average (about 0.8%/yr). Set it to 0% to match the "today's dollars" estimate on your SSA statement, which assumes no future wage growth.</p>
                                     </span>
                                 </span>
                             </div>
-                            <div class="input-affix">
-                                <input type="number" id="realWageGrowth" class="form-input" value="0" min="-5" max="5" step="0.1">
-                                <span class="input-affix__suffix">%</span>
+                            <div class="range-row">
+                                <div class="input-affix">
+                                    <input type="number" id="realWageGrowth" class="form-input" value="1" min="-5" max="5" step="0.1">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
+                                <span class="range-sep" aria-hidden="true">±</span>
+                                <div class="input-affix">
+                                    <input type="number" id="realWageRange" class="form-input" value="0.5" min="0" max="5" step="0.1" aria-label="Real wage growth range (plus or minus %)">
+                                    <span class="input-affix__suffix">%</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1070,27 +1204,52 @@
                         <div class="form-group">
                             <label class="form-label" for="retirementTaxRate">Retirement Tax Rate</label>
                             <div class="input-affix">
-                                <input type="number" id="retirementTaxRate" class="form-input" value="20" min="0" max="60" step="1">
+                                <input type="number" id="retirementTaxRate" class="form-input" value="12" min="0" max="60" step="1">
                                 <span class="input-affix__suffix">%</span>
                             </div>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label class="form-label" for="preVolatility">Volatility (Pre-Retire)</label>
+                                <span class="info-tip" tabindex="0" aria-describedby="volatilityTip">i
+                                    <span class="info-tip__text" role="tooltip" id="volatilityTip">
+                                        <p>How much market returns swing from year to year (standard deviation). Each simulated scenario draws a random return every year that averages out to your return assumption over time, so it includes crashes and booms at random times.</p>
+                                        <p>This matters most around retirement: a crash right after you start withdrawing hurts far more than one decades earlier. US stocks have swung about 20%/yr historically and high-quality bonds about 8%. The defaults assume a target-date-style mix: about 75% stocks on average before retirement (15%) and about 35% after (9%). Set to 0 to ignore market swings.</p>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="input-affix">
+                                <input type="number" id="preVolatility" class="form-input" value="15" min="0" max="50" step="1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="postVolatility">Volatility (Post-Retire)</label>
+                            <div class="input-affix">
+                                <input type="number" id="postVolatility" class="form-input" value="9" min="0" max="50" step="1">
+                                <span class="input-affix__suffix">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="form-hint">The ± ranges are how uncertain each long-run average is. The "Sufficient in" result runs 1,000 scenarios, each picking values within these ranges and drawing random yearly market returns from the volatility above.</p>
                 </div>
             </div>
 
             <!-- Desired Retirement Income -->
-            <div>
-                <div class="contribution-header">
-                    <label class="form-label" for="desiredIncome">Desired Retirement Income (Today's $)</label>
-                    <div class="contribution-toggle">
+            <div class="form-group">
+                <label class="form-label" for="desiredIncome">Desired Retirement Income (Post-Tax, Today's $)</label>
+                <div class="input-with-toggle">
+                    <div class="input-affix">
+                        <span class="input-affix__prefix">$</span>
+                        <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000" data-period="yearly">
+                        <span class="input-affix__suffix" id="desiredIncomeSuffix">/yr</span>
+                    </div>
+                    <div class="contribution-toggle contribution-toggle--vertical">
                         <button type="button" class="toggle-btn" data-income-period="monthly">Monthly</button>
                         <button type="button" class="toggle-btn active" data-income-period="yearly">Yearly</button>
                     </div>
-                </div>
-                <div class="input-affix">
-                    <span class="input-affix__prefix">$</span>
-                    <input type="number" id="desiredIncome" class="form-input" value="60000" min="0" step="1000" data-period="yearly">
-                    <span class="input-affix__suffix" id="desiredIncomeSuffix">/yr</span>
                 </div>
             </div>
 
@@ -1115,6 +1274,18 @@
                 <div class="result-item">
                     <span class="result-label">Savings needed at retirement</span>
                     <span class="result-value" id="savingsNeeded">—</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label label-row">Sufficient in
+                        <span class="info-tip" tabindex="0" aria-describedby="successTip">i
+                            <span class="info-tip__text" role="tooltip" id="successTip">
+                                <p>Share of 1,000 simulated scenarios where your savings last until your life expectancy. Each scenario picks long-run values within your ± ranges (income increase, returns, inflation, real wage growth) and draws a random market return every year using your volatility settings.</p>
+                                <p>The other results and the main graph line use your exact assumptions with steady returns. Financial planners often aim for roughly 80–90%.</p>
+                            </span>
+                        </span>
+                    </span>
+                    <span class="result-value" id="successRate">—</span>
                 </div>
 
                 <div class="result-summary">
@@ -1152,6 +1323,14 @@
         let isSufficientGlobal = false;
         let ssStartAgeGlobal = null;      // null when Social Security is off
         let displayDollars = 'future';    // 'future' (nominal) or 'today' (inflation-adjusted)
+        let scenarioBand = [];            // per-year savings percentiles across scenarios (p10, p25, p75)
+
+        // Monte Carlo: fixed seed so results don't jitter between keystrokes
+        const SCENARIO_COUNT = 1000;
+        const SCENARIO_SEED = 20261008;
+        const BAND_LOW = 0.25;     // shaded band: middle 50% of outcomes
+        const BAND_HIGH = 0.75;
+        const BAD_CASE = 0.1;      // dashed line: 10th percentile
 
         // Social Security parameters (2026 values; update yearly)
         const SS_BASE_YEAR = 2026;
@@ -1237,8 +1416,8 @@
             const retirementAge = Math.round(readNumber('retirementAge', 65));
             const lifeExpectancy = Math.round(readNumber('lifeExpectancy', 95));
 
-            const currentIncome = readNumber('currentIncome', 75000);
-            const incomeGrowthRate = readNumber('incomeGrowthRate', 3) / 100;
+            const currentIncome = readNumber('currentIncome', 60000);
+            const incomeGrowthRate = readNumber('incomeGrowthRate', 4) / 100;
 
             function contributionSpec(account, matchId) {
                 const input = document.getElementById(account + 'Contribution');
@@ -1270,11 +1449,21 @@
                     taxable: contributionSpec('taxable', null)
                 },
                 preRetirementReturn: readNumber('preRetirementReturn', 7) / 100,
-                postRetirementReturn: readNumber('postRetirementReturn', 5) / 100,
+                postRetirementReturn: readNumber('postRetirementReturn', 5.5) / 100,
                 inflationRate: readNumber('inflationRate', 2.5) / 100,
-                realWageGrowth: readNumber('realWageGrowth', 0) / 100,
+                realWageGrowth: readNumber('realWageGrowth', 1) / 100,
+                // ± margins of error (uniform within value ± range) and yearly market volatility
+                ranges: {
+                    incomeGrowthRate: Math.max(0, readNumber('incomeGrowthRange', 0)) / 100,
+                    preRetirementReturn: Math.max(0, readNumber('preReturnRange', 0)) / 100,
+                    postRetirementReturn: Math.max(0, readNumber('postReturnRange', 0)) / 100,
+                    inflationRate: Math.max(0, readNumber('inflationRange', 0)) / 100,
+                    realWageGrowth: Math.max(0, readNumber('realWageRange', 0)) / 100
+                },
+                preVolatility: Math.max(0, readNumber('preVolatility', 15)) / 100,
+                postVolatility: Math.max(0, readNumber('postVolatility', 9)) / 100,
                 capitalGainsRate: Math.min(0.99, readNumber('capitalGainsRate', 15) / 100),
-                retirementTaxRate: Math.min(0.99, readNumber('retirementTaxRate', 20) / 100),
+                retirementTaxRate: Math.min(0.99, readNumber('retirementTaxRate', 12) / 100),
                 // Always annual internally; the field can be entered per month
                 desiredIncome: readNumber('desiredIncome', 60000)
                     * (document.getElementById('desiredIncome').dataset.period === 'monthly' ? 12 : 1),
@@ -1392,8 +1581,9 @@
         // ---- Simulation ----
 
         // Month-by-month simulation from current age (or start.age, which must be at or after
-        // retirement) to life expectancy. Returns yearly data points and the age savings ran out
-        // (null if they never did).
+        // retirement) to life expectancy. inputs.yearReturns (optional) gives each year's return,
+        // indexed by years from now; otherwise the steady pre/post-retirement returns are used.
+        // Returns yearly data points and the age savings ran out (null if they never did).
         function simulate(inputs, adjust = NO_ADJUST, start = null) {
             const { currentAge, retirementAge, lifeExpectancy,
                     currentIncome, incomeGrowthRate,
@@ -1429,7 +1619,9 @@
             for (let age = firstAge; age < lifeExpectancy; age++) {
                 const yearsFromNow = age - currentAge;
                 const retired = age >= retirementAge;
-                const monthlyReturn = retired ? postMonthlyReturn : preMonthlyReturn;
+                const monthlyReturn = inputs.yearReturns
+                    ? monthlyRate(inputs.yearReturns[yearsFromNow])
+                    : (retired ? postMonthlyReturn : preMonthlyReturn);
                 const contrib = retired ? null : contributionsForYear(inputs, income, yearsFromNow, adjust);
                 // Desired income is in today's dollars (after tax); grow it with inflation
                 const monthlySpending = retired ? desiredIncome / 12 * Math.pow(1 + inflationRate, yearsFromNow) : 0;
@@ -1570,12 +1762,75 @@
             return high;
         }
 
+        // ---- Scenarios (Monte Carlo) ----
+
+        // Small seeded PRNG (mulberry32) returning floats in [0, 1)
+        function seededRandom(seed) {
+            return function () {
+                seed = (seed + 0x6D2B79F5) | 0;
+                let t = Math.imul(seed ^ (seed >>> 15), seed | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        // Run SCENARIO_COUNT simulations. Each picks long-run assumptions uniformly within their
+        // ± ranges, then draws a lognormal return for every year: the median year compounds at the
+        // scenario's average return, with the chosen volatility. Returns each scenario's yearly data
+        // (with its inflation, for today's-dollar display) and the share that lasted.
+        function runScenarios(inputs) {
+            const random = seededRandom(SCENARIO_SEED);
+            const normal = () => {
+                const u = 1 - random();  // (0, 1], avoids log(0)
+                return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * random());
+            };
+            const withinRange = (key) => inputs[key] + inputs.ranges[key] * (2 * random() - 1);
+            const years = inputs.lifeExpectancy - inputs.currentAge;
+
+            const scenarios = [];
+            let successes = 0;
+            for (let i = 0; i < SCENARIO_COUNT; i++) {
+                const scenario = { ...inputs };
+                for (const key in inputs.ranges) {
+                    scenario[key] = withinRange(key);
+                }
+                scenario.yearReturns = [];
+                for (let y = 0; y < years; y++) {
+                    const retired = inputs.currentAge + y >= inputs.retirementAge;
+                    const average = retired ? scenario.postRetirementReturn : scenario.preRetirementReturn;
+                    const volatility = retired ? inputs.postVolatility : inputs.preVolatility;
+                    const logSpread = volatility / (1 + average);
+                    scenario.yearReturns.push(Math.exp(Math.log(1 + average) + logSpread * normal()) - 1);
+                }
+                const result = simulate(scenario);
+                if (result.depletedAge === null) successes++;
+                scenarios.push({ data: result.data, inflationRate: scenario.inflationRate });
+            }
+            return { scenarios, successRate: successes / SCENARIO_COUNT };
+        }
+
+        // Per-year savings percentiles across scenarios, in the selected dollars
+        function percentileBand(scenarios, currentAge, showToday) {
+            const band = [];
+            const yearCount = scenarios[0].data.length;
+            for (let i = 0; i < yearCount; i++) {
+                const year = scenarios[0].data[i].year;
+                const values = scenarios.map(({ data, inflationRate }) => {
+                    const factor = showToday ? Math.pow(1 + inflationRate, year - currentAge) : 1;
+                    return data[i].savings / factor;
+                }).sort((a, b) => a - b);
+                const at = (q) => values[Math.min(values.length - 1, Math.floor(q * values.length))];
+                band.push({ year, low: at(BAND_LOW), high: at(BAND_HIGH), bad: at(BAD_CASE) });
+            }
+            return band;
+        }
+
         // Sync income fields (growth rate <-> at retirement income)
         function syncIncomeFields(changedField) {
             const currentAge = Math.round(readNumber('currentAge', 30));
             const retirementAge = Math.round(readNumber('retirementAge', 65));
             const yearsToRetirement = retirementAge - currentAge;
-            const currentIncome = readNumber('currentIncome', 75000);
+            const currentIncome = readNumber('currentIncome', 60000);
             const inflationRate = readNumber('inflationRate', 2.5) / 100;
 
             if (yearsToRetirement <= 0) return;
@@ -1597,6 +1852,33 @@
                     const requiredGrowth = Math.pow(targetFutureIncome / currentIncome, 1 / yearsToRetirement) - 1;
                     document.getElementById('incomeGrowthRate').value = (requiredGrowth * 100).toFixed(2);
                 }
+            }
+
+            // Ranges: ±growth rate <-> ±income at retirement (half the spread between the extremes)
+            const growthRate = readNumber('incomeGrowthRate', 0) / 100;
+            const realIncomeAt = (g) => currentIncome * Math.pow((1 + g) / (1 + inflationRate), yearsToRetirement);
+            const halfSpread = (range) => (realIncomeAt(growthRate + range) - realIncomeAt(growthRate - range)) / 2;
+            if (changedField === 'atRetirementRange') {
+                // Solve for the growth range that gives this ± income (spread grows with range)
+                const target = Math.max(0, readNumber('incomeAtRetirementRange', 0));
+                let low = 0;
+                let high = 0.2;
+                if (halfSpread(high) <= target) {
+                    low = high;
+                } else {
+                    for (let iter = 0; iter < 50; iter++) {
+                        const mid = (low + high) / 2;
+                        if (halfSpread(mid) < target) {
+                            low = mid;
+                        } else {
+                            high = mid;
+                        }
+                    }
+                }
+                document.getElementById('incomeGrowthRange').value = parseFloat((low * 100).toFixed(2));
+            } else {
+                const range = Math.max(0, readNumber('incomeGrowthRange', 0)) / 100;
+                document.getElementById('incomeAtRetirementRange').value = Math.round(halfSpread(range));
             }
         }
 
@@ -1650,12 +1932,14 @@
         }
 
         function showInvalid(message) {
-            ['yearsToRetirement', 'projectedSavings', 'ssResult', 'savingsNeeded'].forEach(id => {
+            ['yearsToRetirement', 'projectedSavings', 'ssResult', 'savingsNeeded', 'successRate'].forEach(id => {
                 document.getElementById(id).textContent = '—';
             });
+            document.getElementById('successRate').classList.remove('success', 'warning', 'error');
             document.getElementById('summaryText').textContent = message;
             savingsData = [];
             minContributionData = [];
+            scenarioBand = [];
             drawGraph();
         }
 
@@ -1705,6 +1989,15 @@
             savingsData = toDisplay(result.data);
             minContributionData = toDisplay(minResultData);
 
+            // Spread of outcomes across scenarios
+            const { scenarios, successRate } = runScenarios(inputs);
+            scenarioBand = percentileBand(scenarios, currentAge, showToday);
+            const successPercent = Math.round(successRate * 100);
+            const successElement = document.getElementById('successRate');
+            successElement.textContent = successPercent + '% of cases';
+            successElement.classList.remove('success', 'warning', 'error');
+            successElement.classList.add(successPercent >= 85 ? 'success' : successPercent >= 70 ? 'warning' : 'error');
+
             const atRetirement = result.data[yearsToRetirement];
             const projectedSavings = atRetirement.savings;
             const savingsNeeded = calculateSavingsNeeded(inputs, atRetirement);
@@ -1732,7 +2025,9 @@
             isSufficientGlobal = result.depletedAge === null;
             if (isSufficientGlobal) {
                 projectedElement.classList.add('success');
-                summaryElement.innerHTML = `You're on track! Your savings will last until age ${lifeExpectancy}. You could potentially retire earlier or increase your retirement income.`;
+                summaryElement.innerHTML = successPercent >= 85
+                    ? `You're on track! Your savings will last until age ${lifeExpectancy}. You could potentially retire earlier or increase your retirement income.`
+                    : `You're on track with steady returns: your savings last until age ${lifeExpectancy}. To hold up better in bad markets, consider saving more or retiring later.`;
             } else if (!min) {
                 projectedElement.classList.add('error');
                 summaryElement.innerHTML = `Your savings run out at age ${result.depletedAge}, and no realistic contribution level fixes that. Try adjusting your retirement age, desired income, or assumptions.`;
@@ -1743,6 +2038,7 @@
                 projectedElement.classList.add('error');
                 summaryElement.innerHTML = `Your savings may run out at age ${result.depletedAge}. Consider increasing your monthly contributions by <span class="summary-highlight">${formatCurrency(contributionDiff)}</span>, adjusting your retirement age, or reducing your desired income.`;
             }
+            summaryElement.innerHTML += ` With market swings and your assumption ranges, your savings last in <span class="summary-highlight">${successPercent}%</span> of simulated scenarios.`;
 
             drawGraph();
         }
@@ -1799,10 +2095,11 @@
             const retirementIndex = retirementAgeGlobal - minYear;
             const savingsAtRetirement = savingsData[retirementIndex]?.savings || 0;
             const minSavingsAtRetirement = minContributionData[retirementIndex]?.savings || 0;
-            const maxSavingsAtRetirement = Math.max(savingsAtRetirement, minSavingsAtRetirement);
+            const bandHighAtRetirement = scenarioBand[retirementIndex]?.high || 0;
+            const maxSavingsAtRetirement = Math.max(savingsAtRetirement, minSavingsAtRetirement, bandHighAtRetirement);
 
-            // Scale y-axis so retirement savings is ~80% of max
-            const targetMax = maxSavingsAtRetirement / 0.8;
+            // Scale y-axis so the highest value at retirement is ~80-85% of max
+            const targetMax = maxSavingsAtRetirement / (bandHighAtRetirement ? 0.85 : 0.8);
             const magnitude = Math.pow(10, Math.floor(Math.log10(targetMax || 1)));
             const niceMax = Math.ceil(targetMax / magnitude) * magnitude || 100000;
 
@@ -1913,7 +2210,20 @@
                 ctx.globalAlpha = 1;
             }
 
-            // Draw main savings filled area
+            const bandFill = styles.getPropertyValue('--graph-band-fill').trim();
+            const bandLine = styles.getPropertyValue('--graph-band-line').trim();
+            const drawBandEdge = (key) => {
+                ctx.beginPath();
+                scenarioBand.forEach((d, i) => {
+                    const x = xScale(d.year);
+                    const y = yScale(d[key]);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
+            };
+
+            // Draw main savings filled area (skipped when the scenario band is shown, to keep it readable)
+            const showMainFill = scenarioBand.length < 2;
             ctx.beginPath();
             ctx.moveTo(xScale(savingsData[0].year), yScale(0));
             savingsData.forEach(d => {
@@ -1922,7 +2232,40 @@
             ctx.lineTo(xScale(savingsData[savingsData.length - 1].year), yScale(0));
             ctx.closePath();
             ctx.fillStyle = fillColor;
-            ctx.fill();
+            if (showMainFill) ctx.fill();
+
+            // Spread of outcomes across scenarios, clipped to the plot area (the upside can run off the top)
+            if (scenarioBand.length >= 2) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(padding.left, padding.top, graphWidth, graphHeight);
+                ctx.clip();
+
+                ctx.beginPath();
+                scenarioBand.forEach((d, i) => {
+                    const x = xScale(d.year);
+                    const y = yScale(d.high);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                for (let i = scenarioBand.length - 1; i >= 0; i--) {
+                    ctx.lineTo(xScale(scenarioBand[i].year), yScale(scenarioBand[i].low));
+                }
+                ctx.closePath();
+                ctx.fillStyle = bandFill;
+                ctx.fill();
+
+                ctx.strokeStyle = bandLine;
+                ctx.lineWidth = 1;
+                drawBandEdge('high');
+                drawBandEdge('low');
+
+                // Bad case (10th percentile)
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([5, 4]);
+                drawBandEdge('bad');
+                ctx.setLineDash([]);
+                ctx.restore();
+            }
 
             // Draw main savings line
             ctx.beginPath();
@@ -1961,6 +2304,28 @@
             ctx.globalAlpha = 1;
             ctx.fillStyle = textColor;
             ctx.fillText('Min. target', legendX + 26, legendY + 30);
+
+            // Scenario band legend
+            if (scenarioBand.length >= 2) {
+                ctx.fillStyle = bandFill;
+                ctx.fillRect(legendX, legendY + 40, 20, 12);
+                ctx.strokeStyle = bandLine;
+                ctx.lineWidth = 1;
+                ctx.strokeRect(legendX + 0.5, legendY + 40.5, 19, 11);
+                ctx.fillStyle = textColor;
+                ctx.fillText('Middle 50% of outcomes', legendX + 26, legendY + 50);
+
+                ctx.beginPath();
+                ctx.moveTo(legendX, legendY + 66);
+                ctx.lineTo(legendX + 20, legendY + 66);
+                ctx.strokeStyle = bandLine;
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([5, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = textColor;
+                ctx.fillText('Bad case (10%)', legendX + 26, legendY + 70);
+            }
 
             // Store graph info for tooltip
             canvas.graphInfo = {
@@ -2014,11 +2379,14 @@
             document.getElementById('tooltipYear').textContent = 'Age ' + dataPoint.year;
             document.getElementById('tooltipValue').textContent = 'Savings: ' + formatCurrency(dataPoint.savings);
 
-            if (minDataPoint) {
-                document.getElementById('tooltipTarget').textContent = 'Target: ' + formatCurrency(minDataPoint.savings);
-            } else {
-                document.getElementById('tooltipTarget').textContent = '';
+            const targetLines = [];
+            if (minDataPoint) targetLines.push('Target: ' + formatCurrency(minDataPoint.savings));
+            const bandPoint = scenarioBand[closestIndex];
+            if (bandPoint) {
+                targetLines.push('Middle 50%: ' + formatCurrency(bandPoint.low) + ' – ' + formatCurrency(bandPoint.high));
+                targetLines.push('Bad case (10%): ' + formatCurrency(bandPoint.bad));
             }
+            document.getElementById('tooltipTarget').innerHTML = targetLines.join('<br>');
 
             document.getElementById('tooltipBreakdown').innerHTML =
                 'Traditional: ' + formatCurrency(dataPoint.traditional) + '<br>'
@@ -2094,7 +2462,9 @@
             'traditionalIncrease', 'rothIncrease', 'taxableIncrease',
             'traditionalMatchPercent', 'rothMatchPercent', 'ssStartAge',
             'preRetirementReturn', 'postRetirementReturn', 'inflationRate', 'realWageGrowth',
-            'capitalGainsRate', 'retirementTaxRate', 'desiredIncome'
+            'capitalGainsRate', 'retirementTaxRate', 'desiredIncome',
+            'incomeGrowthRange', 'preReturnRange', 'postReturnRange', 'inflationRange', 'realWageRange',
+            'preVolatility', 'postVolatility'
         ];
         const STATE_CHECKBOXES = ['traditionalMatchEnabled', 'rothMatchEnabled', 'ssEnabled', 'ssCutEnabled'];
         let defaultState = null;
@@ -2170,8 +2540,10 @@
                         syncIncomeFields('atRetirement');
                     } else if (e.target.id === 'currentIncome') {
                         syncIncomeFields('currentIncome');
-                    } else if (e.target.id === 'currentAge' || e.target.id === 'retirementAge' || e.target.id === 'inflationRate') {
-                        // These affect income sync, update the at-retirement income
+                    } else if (e.target.id === 'incomeAtRetirementRange') {
+                        syncIncomeFields('atRetirementRange');
+                    } else if (['currentAge', 'retirementAge', 'inflationRate', 'incomeGrowthRange'].includes(e.target.id)) {
+                        // These affect income sync, update the at-retirement income and its range
                         syncIncomeFields('growthRate');
                     }
                     calculateRetirement();
@@ -2185,7 +2557,7 @@
                     const targetId = btn.dataset.target;
                     const newMode = btn.dataset.type;
                     const input = document.getElementById(targetId);
-                    const currentIncome = readNumber('currentIncome', 75000) || 1;
+                    const currentIncome = readNumber('currentIncome', 60000) || 1;
                     const currentValue = parseFloat(input.value) || 0;
 
                     // Convert value if switching modes
