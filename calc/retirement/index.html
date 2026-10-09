@@ -39,6 +39,8 @@
             --graph-fill-min: rgba(136, 136, 136, 0.08);
             --graph-band-fill: rgba(138, 124, 184, 0.22);
             --graph-band-line: rgba(138, 124, 184, 0.7);
+            --graph-line-orange: #fb923c;
+            --graph-line-yellow: #facc15;
         }
 
         @media (prefers-color-scheme: light) {
@@ -56,7 +58,7 @@
                 --highlight-border: #6b5b95;
                 --highlight-shadow: rgba(107, 91, 149, 0.15);
                 --success-color: #22c55e;
-                --warning-color: #f59e0b;
+                --warning-color: #ca8a04;
                 --error-color: #ef4444;
                 --graph-grid: #e0e0e5;
                 --graph-line-success: #22c55e;
@@ -67,6 +69,8 @@
                 --graph-fill-min: rgba(153, 153, 153, 0.08);
                 --graph-band-fill: rgba(107, 91, 149, 0.16);
                 --graph-band-line: rgba(107, 91, 149, 0.6);
+                --graph-line-orange: #f97316;
+                --graph-line-yellow: #eab308;
             }
         }
 
@@ -669,6 +673,10 @@
 
         .result-value.warning {
             color: var(--warning-color);
+        }
+
+        .result-value.orange {
+            color: var(--graph-line-orange);
         }
 
         .result-value.error {
@@ -1324,6 +1332,7 @@
         let ssStartAgeGlobal = null;      // null when Social Security is off
         let displayDollars = 'future';    // 'future' (nominal) or 'today' (inflation-adjusted)
         let scenarioBand = [];            // per-year savings percentiles across scenarios (p10, p25, p75)
+        let successRateGlobal = 0;        // share of scenarios that last to life expectancy
 
         // Monte Carlo: fixed seed so results don't jitter between keystrokes
         const SCENARIO_COUNT = 1000;
@@ -1935,7 +1944,7 @@
             ['yearsToRetirement', 'projectedSavings', 'ssResult', 'savingsNeeded', 'successRate'].forEach(id => {
                 document.getElementById(id).textContent = '—';
             });
-            document.getElementById('successRate').classList.remove('success', 'warning', 'error');
+            document.getElementById('successRate').classList.remove('success', 'warning', 'orange', 'error');
             document.getElementById('summaryText').textContent = message;
             savingsData = [];
             minContributionData = [];
@@ -1992,11 +2001,16 @@
             // Spread of outcomes across scenarios
             const { scenarios, successRate } = runScenarios(inputs);
             scenarioBand = percentileBand(scenarios, currentAge, showToday);
+            successRateGlobal = successRate;
             const successPercent = Math.round(successRate * 100);
             const successElement = document.getElementById('successRate');
             successElement.textContent = successPercent + '% of cases';
-            successElement.classList.remove('success', 'warning', 'error');
-            successElement.classList.add(successPercent >= 85 ? 'success' : successPercent >= 70 ? 'warning' : 'error');
+            // Same tiers as the bad case line: red if the steady-returns plan runs out, then by share of scenarios
+            successElement.classList.remove('success', 'warning', 'orange', 'error');
+            successElement.classList.add(result.depletedAge !== null ? 'error'
+                : successRate < 0.75 ? 'orange'
+                : successRate < 0.9 ? 'warning'
+                : 'success');
 
             const atRetirement = result.data[yearsToRetirement];
             const projectedSavings = atRetirement.savings;
@@ -2025,7 +2039,7 @@
             isSufficientGlobal = result.depletedAge === null;
             if (isSufficientGlobal) {
                 projectedElement.classList.add('success');
-                summaryElement.innerHTML = successPercent >= 85
+                summaryElement.innerHTML = successRate >= 0.9
                     ? `You're on track! Your savings will last until age ${lifeExpectancy}. You could potentially retire earlier or increase your retirement income.`
                     : `You're on track with steady returns: your savings last until age ${lifeExpectancy}. To hold up better in bad markets, consider saving more or retiring later.`;
             } else if (!min) {
@@ -2098,8 +2112,10 @@
             const bandHighAtRetirement = scenarioBand[retirementIndex]?.high || 0;
             const maxSavingsAtRetirement = Math.max(savingsAtRetirement, minSavingsAtRetirement, bandHighAtRetirement);
 
-            // Scale y-axis so the highest value at retirement is ~80-85% of max
-            const targetMax = maxSavingsAtRetirement / (bandHighAtRetirement ? 0.85 : 0.8);
+            // Scale y-axis so the highest value at retirement is ~80-85% of max, while always
+            // keeping the full savings and target lines on the chart (the band may run off the top)
+            const lineMax = Math.max(...savingsData.map(d => d.savings), ...minContributionData.map(d => d.savings));
+            const targetMax = Math.max(maxSavingsAtRetirement / (bandHighAtRetirement ? 0.85 : 0.8), lineMax / 0.95);
             const magnitude = Math.pow(10, Math.floor(Math.log10(targetMax || 1)));
             const niceMax = Math.ceil(targetMax / magnitude) * magnitude || 100000;
 
@@ -2212,6 +2228,12 @@
 
             const bandFill = styles.getPropertyValue('--graph-band-fill').trim();
             const bandLine = styles.getPropertyValue('--graph-band-line').trim();
+            // Bad case line color: red if the steady-returns plan runs out; otherwise by how many
+            // scenarios last (25th percentile runs out -> orange, 10th -> yellow, neither -> green)
+            const badCaseColor = !isSufficientGlobal ? styles.getPropertyValue('--graph-line-error').trim()
+                : successRateGlobal < 0.75 ? styles.getPropertyValue('--graph-line-orange').trim()
+                : successRateGlobal < 0.9 ? styles.getPropertyValue('--graph-line-yellow').trim()
+                : styles.getPropertyValue('--graph-line-success').trim();
             const drawBandEdge = (key) => {
                 ctx.beginPath();
                 scenarioBand.forEach((d, i) => {
@@ -2260,6 +2282,7 @@
                 drawBandEdge('low');
 
                 // Bad case (10th percentile)
+                ctx.strokeStyle = badCaseColor;
                 ctx.lineWidth = 1.5;
                 ctx.setLineDash([5, 4]);
                 drawBandEdge('bad');
@@ -2318,7 +2341,7 @@
                 ctx.beginPath();
                 ctx.moveTo(legendX, legendY + 66);
                 ctx.lineTo(legendX + 20, legendY + 66);
-                ctx.strokeStyle = bandLine;
+                ctx.strokeStyle = badCaseColor;
                 ctx.lineWidth = 1.5;
                 ctx.setLineDash([5, 4]);
                 ctx.stroke();
